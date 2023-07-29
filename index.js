@@ -13,7 +13,7 @@ app.use(cookieParser());
 
 app.use('/api/auth', authRoute)
 app.use('/api/admin', adminRoute)
-app.use('api/users', usersRoute)
+app.use('/api/users', usersRoute)
 
 
 app.listen(8080,()=>{

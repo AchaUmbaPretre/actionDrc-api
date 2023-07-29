@@ -30,7 +30,7 @@ export const login = (req, res)=>{
     
     const q = 'SELECT * FROM users WHERE username = ?'
      
-    db.query(q,[req.body.username], (error, data)=>{
+    db.query(q,[req.body.email], (error, data)=>{
         if(error) return res.json(error);
         if(data.length === 0) return res.status(404).json("Utilisateur n'existe pas");
 
