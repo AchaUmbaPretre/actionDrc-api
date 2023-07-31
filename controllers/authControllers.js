@@ -28,7 +28,7 @@ export const register = (req, res)=>{
 
 export const login = (req, res)=>{
     
-    const q = 'SELECT * FROM users WHERE username = ?'
+    const q = 'SELECT * FROM users WHERE email = ?'
      
     db.query(q,[req.body.email], (error, data)=>{
         if(error) return res.json(error);

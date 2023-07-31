@@ -27,7 +27,7 @@ export const viewsEmploye = (req, res) =>{
 }
 
 export const postEmploye = (req, res) => {
-    const q = 'INSERT INTO employees(`first_name`,`last_name`,`date_of_birth`,`gender`,`address`,`phone_number`,`email`,`identification_number`,`identification_type`,`skills`, `certifications`, `employment_status`,`contrat_id`) VALUES(?)';
+    const q = 'INSERT INTO employees(`first_name`,`last_name`,`date_of_birth`,`gender`,`address`,`phone_number`,`email`,`identification_number`,`identification_type`,`skills`, `certifications`, `employment_status`,`contrat_id`, `source`) VALUES(?)';
     const values = [
         req.body.first_name,
         req.body.last_name,
@@ -41,7 +41,8 @@ export const postEmploye = (req, res) => {
         req.body.skills,
         req.body.certifications,
         req.body.employment_status,
-        req.body.contrat_id
+        req.body.contrat_id,
+        req.body.source
     ]
 
     db.query(q, [values], (error,data)=>{
