@@ -149,3 +149,91 @@ export const updateContrat = (req, res) =>{
         return res.json(data);
       });
 }
+
+export const getClient = (req, res) =>{
+    const q = "SELECT * FROM clients";
+     
+    db.query(q ,(error, data)=>{
+        if(error) res.status(500).send(error)
+
+        return res.status(200).json(data);
+    })
+}
+
+export const viewsClient = (req, res) =>{
+    const {id} = req.params;
+    const q = "SELECT * FROM clients where id = ?";
+
+    db.query(q, id, (error, data)=>{
+        if(error) res.status(500).send(error)
+        return res.status(200).json(data);
+    })
+       
+}
+
+export const postClient= (req, res) =>{
+    const q = 'INSERT INTO clients(`company_name`,`address`,`phone_number`,`contact_name`,`contact_email`,`rccm`,`idnate`,`contact_phone`) VALUES(?)';
+    const values = [
+        req.body.company_name,
+        req.body.address,
+        req.body.phone_number,
+        req.body.contact_name,
+        req.body.contact_email,
+        req.body.rccm,
+        req.body.idnate,
+        req.body.contact_phone,
+    ]
+
+    db.query(q, [values], (error,data)=>{
+        if(error) res.status(500).json(error)
+        return res.json('processus reussi');
+    })
+}
+
+    
+export const deleteClient = (req, res) =>{
+
+    const clientId = req.params.id;
+    const q = "DELETE FROM clients WHERE id = ?"
+
+    db.query(q, [clientId], (err, data)=>{
+        if (err) return res.send(err);
+      return res.json(data);
+    })
+}
+
+
+export const getFonction = (req, res) =>{
+    const q = "SELECT * FROM fonction";
+     
+    db.query(q ,(error, data)=>{
+        if(error) res.status(500).send(error)
+
+        return res.status(200).json(data);
+    })
+}
+
+export const postAffectation = (req, res) =>{
+    const q = 'INSERT INTO affectations(`fonction_id`,`emploie_id`,`salaire_id`,`contrat_id`) VALUES(?)';
+    const values = [
+        req.body.fonction_id,
+        req.body.emploie_id,
+        req.body.salaire_id,
+        req.body.contrat_id,
+    ]
+
+    db.query(q, [values], (error,data)=>{
+        if(error) res.status(500).json(error)
+        return res.json('processus reussi');
+    })
+}
+
+export const getAffectation = (req,res) =>{
+    const q = "SELECT * FROM affectations";
+     
+    db.query(q ,(error, data)=>{
+        if(error) res.status(500).send(error)
+
+        return res.status(200).json(data);
+    })
+}
