@@ -202,9 +202,29 @@ export const deleteClient = (req, res) =>{
     })
 }
 
+export const updateClient = (req, res)=> {
+    const employeId = req.params.id;
+    const q = "UPDATE clients SET `company_name`= ?, `address`= ?, `phone_number`= ?, `contact_name`= ?, `address`= ?,`phone_number`= ?, `contact_email`= ?, `rccm`= ?, `idnate`= ?,`contact_phone`= ? WHERE id = ?"
+    const values = [
+        req.body.company_name,
+        req.body.address,
+        req.body.phone_number,
+        req.body.contact_name,
+        req.body.contact_email,
+        req.body.rccm,
+        req.body.idnate,
+        req.body.contact_phone
+    ];
+    db.query(q, [...values,employeId], (err, data) => {
+        if (err) return res.send(err);
+        return res.json(data);
+      });
+}
+
+
 
 export const getFonction = (req, res) =>{
-    const q = "SELECT * FROM fonction";
+    const q = "SELECT * FROM fonctions";
      
     db.query(q ,(error, data)=>{
         if(error) res.status(500).send(error)
@@ -214,11 +234,10 @@ export const getFonction = (req, res) =>{
 }
 
 export const postAffectation = (req, res) =>{
-    const q = 'INSERT INTO affectations(`fonction_id`,`emploie_id`,`salaire_id`,`contrat_id`) VALUES(?)';
+    const q = 'INSERT INTO affectations(`fonction_id`,`emploie_id`,`contrat_id`) VALUES(?)';
     const values = [
         req.body.fonction_id,
         req.body.emploie_id,
-        req.body.salaire_id,
         req.body.contrat_id,
     ]
 
@@ -235,5 +254,27 @@ export const getAffectation = (req,res) =>{
         if(error) res.status(500).send(error)
 
         return res.status(200).json(data);
+    })
+}
+
+export const getAllAffectation = (req, res) => {
+    const q = "SELECT emp1.id, emp1.first_name, emp1.last_name, emp1.skills, fonctions.nom, fonctions.salaire, contrats.end_date FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonctions ON affectations.fonction_id = fonctions.id INNER JOIN contrats ON affectations.contrat_id = contrats.id";
+    db.query(q, (error, data) => {
+      if (error) {
+        return res.status(500).send(error);
+      }
+      
+      return res.status(200).json(data);
+    });
+  }
+
+  export const deleteAffectation = (req, res) =>{
+
+    const clientId = req.params.id;
+    const q = "DELETE FROM affectation WHERE id = ?"
+
+    db.query(q, [clientId], (err, data)=>{
+        if (err) return res.send(err);
+      return res.json(data);
     })
 }

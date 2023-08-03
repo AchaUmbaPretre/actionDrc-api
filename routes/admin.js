@@ -1,5 +1,5 @@
 import express from "express";
-import { deleteClient, deleteContrat, deleteEmploye, getAffectation, getClient, getContrat, getEmploye, getFonction, postAffectation, postClient, postContrat, postEmploye, updateContrat, updateEmploye, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
+import { deleteAffectation, deleteClient, deleteContrat, deleteEmploye, getAffectation, getAllAffectation, getClient, getContrat, getEmploye, getFonction, postAffectation, postClient, postContrat, postEmploye, updateContrat, updateEmploye, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
 const router = express.Router()
 
 router.get('/', getEmploye)
@@ -19,10 +19,12 @@ router.get('/client', getClient)
 router.get('/viewsClient/:id', viewsClient)
 router.post('/clientPost', postClient)
 router.delete('/client/:id', deleteClient)
+router.put('/client/:id', updateContrat)
 
 
 router.get('/fonction', getFonction)
 router.post('/affectations', postAffectation)
 router.get('/affectation', getAffectation)
-
+router.get('/allaffectation', getAllAffectation)
+router.delete('/deleteAff', deleteAffectation)
 export default router
