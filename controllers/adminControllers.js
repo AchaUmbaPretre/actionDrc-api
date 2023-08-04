@@ -278,3 +278,72 @@ export const getAllAffectation = (req, res) => {
       return res.json(data);
     })
 }
+
+export const getMission = (req,res) =>{
+    const q = "SELECT * FROM mission";
+     
+    db.query(q ,(error, data)=>{
+        if(error) res.status(500).send(error)
+
+        return res.status(200).json(data);
+    })
+}
+
+export const getMissionView = (req,res) =>{
+    const q = "SELECT * FROM mission where id = ?";
+     
+    db.query(q ,(error, data)=>{
+        if(error) res.status(500).send(error)
+
+        return res.status(200).json(data);
+    })
+}
+
+export const postMission = (req, res) =>{
+    const q = 'INSERT INTO mission(`agent`,`client`,`date`,`duree`,`montant`) VALUES(?)';
+    const values = [
+        req.body.agent,
+        req.body.client,
+        req.body.date,
+        req.body.duree,
+        req.body.montant
+    ]
+
+    db.query(q, [values], (error,data)=>{
+        if(error) res.status(500).json(error)
+        return res.json('processus reussi');
+    })
+}
+
+export const deleteMission = (req, res) =>{
+
+    const clientId = req.params.id;
+    const q = "DELETE FROM affectation WHERE id = ?"
+
+    db.query(q, [clientId], (err, data)=>{
+        if (err) return res.send(err);
+      return res.json(data);
+    })
+}
+
+export const getDuration = (req, res)=>{
+
+    const q = "SELECT start_date, end_date FROM contrats";
+     
+    db.query(q ,(error, data)=>{
+        if(error) res.status(500).send(error)
+
+        return res.status(200).json(data);
+    })
+}
+
+export const getSalaireMission = (req, res)=>{
+
+    const q = "SELECT id, salaire FROM fonctions";
+     
+    db.query(q ,(error, data)=>{
+        if(error) res.status(500).send(error)
+
+        return res.status(200).json(data);
+    })
+}
