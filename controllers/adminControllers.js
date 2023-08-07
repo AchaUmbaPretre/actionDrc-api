@@ -1,7 +1,7 @@
 import { db } from "../db.js";
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
-
+import moment from 'moment';
 
 dotenv.config();
 
@@ -104,13 +104,43 @@ export const viewsContrat = (req, res) =>{
     })
        
 }
+export const getAvantage = (req, res) =>{
+    const q = "SELECT * FROM avantages";
+     
+    db.query(q ,(error, data)=>{
+        if(error) res.status(500).send(error)
+
+        return res.status(200).json(data);
+    })
+}
+
+export const getContratType = (req, res) =>{
+    const q = "SELECT * FROM typecontrat";
+     
+    db.query(q ,(error, data)=>{
+        if(error) res.status(500).send(error)
+
+        return res.status(200).json(data);
+    })
+}
+
+export const getStatusContrat = (req, res) =>{
+    const q = "SELECT * FROM statusContrat";
+     
+    db.query(q ,(error, data)=>{
+        if(error) res.status(500).send(error)
+
+        return res.status(200).json(data);
+    })
+}
 
 export const postContrat = (req, res) =>{
-    const q = 'INSERT INTO contrats(`contract_type`,`start_date`,`end_date`,`hourly_rate`,`benefits`,`contract_status`) VALUES(?)';
+    const q = 'INSERT INTO contrats(`contract_type`,`start_date`,`end_date`,`date_engagement`,`hourly_rate`,`benefits`,`contract_status`) VALUES(?)';
     const values = [
         req.body.contract_type,
         req.body.start_date,
         req.body.end_date,
+        req.body.date_engagement,
         req.body.hourly_rate,
         req.body.benefits,
         req.body.contract_status,
@@ -299,21 +329,47 @@ export const getMissionView = (req,res) =>{
     })
 }
 
-export const postMission = (req, res) =>{
-    const q = 'INSERT INTO mission(`agent`,`client`,`date`,`duree`,`montant`) VALUES(?)';
+/* export const postMission = (req, res) => {
+    const q = 'INSERT INTO mission(`agent_id`,`client_id`,`date`,`duree`,`montant`) VALUES(?)';
+  
+    const dateEntrant = moment(req.body.date);
+    const dateSortant = moment(req.body.duree);
+  
+    
+    const duree = dateSortant.diff(dateEntrant, 'days');
+  
     const values = [
-        req.body.agent,
-        req.body.client,
-        req.body.date,
-        req.body.duree,
-        req.body.montant
-    ]
+      req.body.agent_id,
+      req.body.client_id,
+      req.body.date,
+      req.body.duree,
+      req.body.montant
+    ];
+  
+    db.query(q, [values], (error, data) => {
+      if (error) res.status(500).json(error);
+      return res.json('processus reussi');
+    });
+  } */;
 
-    db.query(q, [values], (error,data)=>{
-        if(error) res.status(500).json(error)
-        return res.json('processus reussi');
-    })
-}
+  export const postMission = (req, res) => {
+    const q = 'INSERT INTO mission (`agent_id`, `client_id`, `date`, `duree`, `montant`) VALUES (?, ?, ?, ?, ?)';
+    const values = [
+      req.body.agent_id,
+      req.body.client_id,
+      req.body.date,
+      req.body.duree,
+      req.body.montant
+    ];
+  
+    db.query(q, values, (error, data) => {
+      if (error) {
+        res.status(500).json(error);
+      } else {
+        res.json('processus reussi');
+      }
+    });
+  };
 
 export const deleteMission = (req, res) =>{
 
@@ -347,3 +403,69 @@ export const getSalaireMission = (req, res)=>{
         return res.status(200).json(data);
     })
 }
+
+export const getAllMission = (req, res) => {
+    const q = "SELECT emp1.id, emp1.first_name, fonctions.nom, fonctions.salaire, contrats.end_date FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonctions ON affectations.fonction_id = fonctions.id INNER JOIN contrats ON affectations.contrat_id = contrats.id";
+    db.query(q, (error, data) => {
+      if (error) {
+        return res.status(500).send(error);
+      }
+      
+      return res.status(200).json(data);
+    });
+  }
+
+  export const getHoraire = (req, res) => {
+    const q = "SELECT * FROM work_schedule";
+     
+    db.query(q ,(error, data)=>{
+        if(error) res.status(500).send(error)
+
+        return res.status(200).json(data);
+    })
+  }
+export const postHoraire = (req, res) => {
+    const { employeeId, clientId, startDate, endDate, weekday, startTime, endTime } = req.body;
+  
+    const query = `INSERT INTO work_schedule (employee_id, client_id, start_date, end_date, weekday, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const values = [employeeId, clientId, startDate, endDate, weekday, startTime, endTime];
+  
+    db.query(query, values, (error, result) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Échec de la création du calendrier' });
+      } else {
+        res.status(201).json({ message: "Programme créé avec succès" });
+      }
+    });
+}
+
+export const getAllHoraire = (req, res) => {
+
+    const query = `SELECT * FROM work_schedule WHERE type = 'variable'`;
+  
+    db.query(query, (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to retrieve the variable schedules' });
+      } else {
+        res.status(200).json(results);
+      }
+    });
+  };
+
+export const putHoraires = (req, res) => {
+    const { id } = req.params;
+    const { startDate, endDate, weekday, startTime, endTime } = req.body;
+  
+    const query = `UPDATE work_schedule SET start_date = ?, end_date = ?, weekday = ?, start_time = ?, end_time = ? WHERE schedule_id = ?`;
+    const values = [startDate, endDate, weekday, startTime, endTime, id];
+  
+    db.query(query, values, (error, result) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Échec de la mise à jour du calendrier' });
+      } else {
+        res.status(200).json({ message: 'Horaire mis à jour avec succès' });
+      }
+    }) }
