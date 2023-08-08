@@ -449,7 +449,7 @@ export const getAllHoraire = (req, res) => {
     db.query(query, (error, results) => {
       if (error) {
         console.error(error);
-        res.status(500).json({ error: 'Failed to retrieve the variable schedules' });
+        res.status(500).json({ erreur : 'Échec de la récupération des horaires variables' });
       } else {
         res.status(200).json(results);
       }
@@ -495,7 +495,38 @@ export const getPresence = (req,res) => {
 }
 
 export const postPresence = (req, res)=>{
-  const { employeeId, checkInTime, checkOutTime } = req.body;
+  const { employee_id, client_id, date, check_in_time, check_out_time } = req.body;
+  console.log(employee_id, check_out_time.day)
+
+  const checkScheduleQuery = `SELECT * FROM work_schedule WHERE employee_id  = ? AND weekday = ?`;
+
+  db.query(checkScheduleQuery, [employee_id, check_in_time.day], (error, results)=>{
+    if (error) {
+      console.error("Erreur lors de la vérification de l'horaire de travail: ", error);
+      res.status(500).json({ error: "Erreur lors de la vérification de l'horaire de travail" });
+    } else if(results.length === 0){
+      res.status(400).json({ error: "Aucun horaire de travail trouvé pour l'employé et le jour" });
+    }else {
+      const schedule = results[0];
+      const startTime = new Date(check_in_time.time);
+      const endTime = new Date(check_out_time.time);
+      const workStartTime = new Date(schedule.start_time);
+      const workEndTime = new Date(schedule.end_time);
+
+      if (startTime < workStartTime || endTime > workEndTime) {
+        res.status(400).json({ error: "L'heure d'arrivée/de départ est en dehors de l'horaire de travail" });
+      } else {
+        const insertAttendanceQuery = 'INSERT INTO attendance (employee_id, client_id, date, check_in_time, check_out_time) VALUES (?, ?, ?, ?, ?)';
+        db.query(insertAttendanceQuery,
+          [employee_id, client_id, date, check_in_time.time, check_out_time.time],  (error, results) =>{
+            if(error){
+              console.error("Erreur lors de l'insertion de la présence : ", error);
+              res.status(500).json({ error: 'Error inserting attendance' });
+            } else  res.json({ message: "Présence enregistrée avec succès" });
+          })
+      }
+    }
+  })
 }
 
 export const deletePresence = (req, res) =>{
@@ -510,5 +541,5 @@ export const deletePresence = (req, res) =>{
 }
 
 export const updatePresence = (req, res) =>{
-  
+
 }
