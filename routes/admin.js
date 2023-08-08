@@ -1,5 +1,5 @@
 import express from "express";
-import { deleteAffectation, deleteClient, deleteContrat, deleteEmploye, deleteMission, getAffectation, getAllAffectation, getAllHoraire, getAllMission, getAvantage, getClient, getContrat, getContratType, getDuration, getEmploye, getFonction, getHoraire, getMission, getMissionView, getSalaireMission, getStatusContrat, postAffectation, postClient, postContrat, postEmploye, postHoraire, postMission, putHoraires, updateContrat, updateEmploye, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
+import { deleteAffectation, deleteClient, deleteContrat, deleteEmploye, deleteHoraire, deleteMission, deletePresence, getAffectation, getAllAffectation, getAllHoraire, getAllMission, getAvantage, getClient, getContrat, getContratType, getDuration, getEmploye, getFonction, getHoraire, getMission, getMissionView, getPresence, getSalaireMission, getStatusContrat, postAffectation, postClient, postContrat, postEmploye, postHoraire, postMission, postPresence, putHoraires, updateContrat, updateEmploye, updatePresence, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
 const router = express.Router()
 
 router.get('/', getEmploye)
@@ -43,7 +43,14 @@ router.get('/salaireMission', getSalaireMission)
 
 
 router.get('/horaire', getHoraire)
-router.post('/horaires', postHoraire)
+router.post('/horairesPost', postHoraire)
 router.get('/horaires/:id', getAllHoraire)
-router.put('/horaires',putHoraires)
+router.delete('/deleteHoraire/:id', deleteHoraire)
+router.put('/horaires/:id',putHoraires)
+
+router.get('/presence', getPresence)
+router.post('/presences', postPresence)
+router.delete('/presence/:id', deletePresence)
+router.put('/presencePut', updatePresence)
+
 export default router

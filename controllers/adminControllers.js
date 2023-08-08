@@ -329,7 +329,7 @@ export const getMissionView = (req,res) =>{
     })
 }
 
-/* export const postMission = (req, res) => {
+export const postMission = (req, res) => {
     const q = 'INSERT INTO mission(`agent_id`,`client_id`,`date`,`duree`,`montant`) VALUES(?)';
   
     const dateEntrant = moment(req.body.date);
@@ -342,7 +342,7 @@ export const getMissionView = (req,res) =>{
       req.body.agent_id,
       req.body.client_id,
       req.body.date,
-      req.body.duree,
+      duree,
       req.body.montant
     ];
   
@@ -350,9 +350,11 @@ export const getMissionView = (req,res) =>{
       if (error) res.status(500).json(error);
       return res.json('processus reussi');
     });
-  } */;
+  }
 
-  export const postMission = (req, res) => {
+  
+
+/*   export const postMission = (req, res) => {
     const q = 'INSERT INTO mission (`agent_id`, `client_id`, `date`, `duree`, `montant`) VALUES (?, ?, ?, ?, ?)';
     const values = [
       req.body.agent_id,
@@ -369,12 +371,12 @@ export const getMissionView = (req,res) =>{
         res.json('processus reussi');
       }
     });
-  };
+  }; */
 
 export const deleteMission = (req, res) =>{
 
     const clientId = req.params.id;
-    const q = "DELETE FROM affectation WHERE id = ?"
+    const q = "DELETE FROM mission WHERE id = ?"
 
     db.query(q, [clientId], (err, data)=>{
         if (err) return res.send(err);
@@ -425,10 +427,10 @@ export const getAllMission = (req, res) => {
     })
   }
 export const postHoraire = (req, res) => {
-    const { employeeId, clientId, startDate, endDate, weekday, startTime, endTime } = req.body;
+    const { employee_id, client_id, start_date, end_date, weekday, start_time, end_time } = req.body;
   
-    const query = `INSERT INTO work_schedule (employee_id, client_id, start_date, end_date, weekday, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    const values = [employeeId, clientId, startDate, endDate, weekday, startTime, endTime];
+    const query = `INSERT INTO work_schedule (employee_id , client_id, start_date, end_date, weekday, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const values = [employee_id, client_id, start_date, end_date, weekday, start_date,start_time, end_time];
   
     db.query(query, values, (error, result) => {
       if (error) {
@@ -454,6 +456,17 @@ export const getAllHoraire = (req, res) => {
     });
   };
 
+  export const deleteHoraire = (req, res) =>{
+
+    const clientId = req.params.id;
+    const q = "DELETE FROM work_schedule WHERE id = ?"
+
+    db.query(q, [clientId], (err, data)=>{
+        if (err) return res.send(err);
+      return res.json(data);
+    })
+}
+
 export const putHoraires = (req, res) => {
     const { id } = req.params;
     const { startDate, endDate, weekday, startTime, endTime } = req.body;
@@ -469,3 +482,33 @@ export const putHoraires = (req, res) => {
         res.status(200).json({ message: 'Horaire mis à jour avec succès' });
       }
     }) }
+
+
+export const getPresence = (req,res) => {
+  const q = "SELECT * FROM attendance";
+   
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
+export const postPresence = (req, res)=>{
+  const { employeeId, checkInTime, checkOutTime } = req.body;
+}
+
+export const deletePresence = (req, res) =>{
+
+  const clientId = req.params.id;
+  const q = "DELETE FROM attendance WHERE id = ?"
+
+  db.query(q, [clientId], (err, data)=>{
+      if (err) return res.send(err);
+    return res.json(data);
+  })
+}
+
+export const updatePresence = (req, res) =>{
+  
+}
