@@ -352,26 +352,6 @@ export const postMission = (req, res) => {
     });
   }
 
-  
-
-/*   export const postMission = (req, res) => {
-    const q = 'INSERT INTO mission (`agent_id`, `client_id`, `date`, `duree`, `montant`) VALUES (?, ?, ?, ?, ?)';
-    const values = [
-      req.body.agent_id,
-      req.body.client_id,
-      req.body.date,
-      req.body.duree,
-      req.body.montant
-    ];
-  
-    db.query(q, values, (error, data) => {
-      if (error) {
-        res.status(500).json(error);
-      } else {
-        res.json('processus reussi');
-      }
-    });
-  }; */
 
 export const deleteMission = (req, res) =>{
 
@@ -471,7 +451,7 @@ export const putHoraires = (req, res) => {
     const { id } = req.params;
     const { startDate, endDate, weekday, startTime, endTime } = req.body;
   
-    const query = `UPDATE work_schedule SET start_date = ?, end_date = ?, weekday = ?, start_time = ?, end_time = ? WHERE schedule_id = ?`;
+    const query = `UPDATE work_schedule SET start_date = ?, end_date = ?, weekday = ?, start_time = ?, end_time = ? WHERE id = ?`;
     const values = [startDate, endDate, weekday, startTime, endTime, id];
   
     db.query(query, values, (error, result) => {
@@ -541,5 +521,46 @@ export const deletePresence = (req, res) =>{
 }
 
 export const updatePresence = (req, res) =>{
+  const { id } = req.params;
+  const {employee_id, client_id, date, check_in_time, check_out_time } = req.body;
 
+  const query = `UPDATE attendance SET employee_id = ?, client_id = ?, date = ?, check_in_time = ?, check_out_time = ? WHERE id = ?`;
+  const values = [employee_id, client_id, date, check_in_time, check_out_time, id];
+
+  db.query(query, values, (error, result) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Échec de la mise à jour de presence' });
+    } else {
+      res.status(200).json({ message: 'Presence a ete modifié jour avec succès' });
+    }
+  }) 
 }
+
+
+export const getFacture = (req, res) => {
+  const q = "SELECT * FROM invoices";
+   
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
+export const postFacture = async (req, res) => {
+  const { client_id, invoice_date, due_date, total_amount, status } = req.body;
+
+  try {
+  const montantQuery = 'INSERT INTO invoices (client_id, invoice_date, due_date, total_amount, status) VALUES (?, ?, ?, ?, ?)';
+
+  const [result] = await db.execute(montantQuery, [client_id, invoice_date, due_date, total_amount, status]);
+  db.end();
+
+  res.json({ id: result.id, message: 'Facture créée avec succès' });
+} catch(error) {
+  console.error("Erreur lors de la création de la facture : ", error);
+  res.status(500).json({ error: "Erreur lors de la création de la facture" });
+}
+};
+

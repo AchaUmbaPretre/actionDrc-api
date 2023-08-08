@@ -53,4 +53,8 @@ router.post('/presences', postPresence)
 router.delete('/presence/:id', deletePresence)
 router.put('/presencePut', updatePresence)
 
+router.get('/facture', getFacture);
+router.post('/factures', postFacture)
+router.delete('/facture/:id', deleteFacture)
+
 export default router
