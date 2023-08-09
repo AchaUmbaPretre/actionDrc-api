@@ -330,27 +330,33 @@ export const getMissionView = (req,res) =>{
 }
 
 export const postMission = (req, res) => {
-    const q = 'INSERT INTO mission(`agent_id`,`client_id`,`date`,`duree`,`montant`) VALUES(?)';
-  
-    const dateEntrant = moment(req.body.date);
-    const dateSortant = moment(req.body.duree);
-  
-    
-    const duree = dateSortant.diff(dateEntrant, 'days');
-  
-    const values = [
-      req.body.agent_id,
-      req.body.client_id,
-      req.body.date,
-      duree,
-      req.body.montant
-    ];
-  
-    db.query(q, [values], (error, data) => {
-      if (error) res.status(500).json(error);
-      return res.json('processus reussi');
-    });
-  }
+  const q =
+    'INSERT INTO mission (`agent_id`, `client_id`, `dateEntrant`, `dateSortant`, `duree`, `montant`) VALUES (?, ?, ?, ?, ?, ?)';
+
+  const dateEntrant = moment(req.body.dateEntrant, 'YYYY-MM-DD');
+  const dateSortant = moment(req.body.dateSortant, 'YYYY-MM-DD');
+
+  const duree = Math.ceil(dateSortant.diff(dateEntrant, 'months'));
+
+  console.log(req.body.montant, duree);
+
+  const values = [
+    req.body.agent_id,
+    req.body.client_id,
+    req.body.dateEntrant,
+    req.body.dateSortant,
+    duree,
+    req.body.montant,
+  ];
+
+  db.query(q, values, (error, data) => {
+    if (error) {
+      res.status(500).json(error);
+    } else {
+      res.json('Processus réussi');
+    }
+  });
+};
 
 
 export const deleteMission = (req, res) =>{
@@ -548,19 +554,44 @@ export const getFacture = (req, res) => {
   })
 }
 
+export const getMontantStatus = (req, res) => {
+  const q = "SELECT * FROM statusmontant";
+   
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
 export const postFacture = async (req, res) => {
   const { client_id, invoice_date, due_date, total_amount, status } = req.body;
 
   try {
-  const montantQuery = 'INSERT INTO invoices (client_id, invoice_date, due_date, total_amount, status) VALUES (?, ?, ?, ?, ?)';
+    const montantQuery = 'INSERT INTO invoices (client_id, invoice_date, due_date, total_amount, status) VALUES (?, ?, ?, ?, ?)';
 
-  const [result] = await db.execute(montantQuery, [client_id, invoice_date, due_date, total_amount, status]);
-  db.end();
-
-  res.json({ id: result.id, message: 'Facture créée avec succès' });
-} catch(error) {
-  console.error("Erreur lors de la création de la facture : ", error);
-  res.status(500).json({ error: "Erreur lors de la création de la facture" });
-}
+    db.query(montantQuery, [client_id, invoice_date, due_date, total_amount, status], (error, result) => {
+      if (error) {
+        console.error("Erreur lors de la création de la facture : ", error);
+        res.status(500).json({ error: "Erreur lors de la création de la facture" });
+      } else {
+        const invoiceId = result.insertId;
+        res.json({ invoice_id: invoiceId, message: 'Facture créée avec succès' });
+      }
+    });
+  } catch (error) {
+    console.error("Erreur lors de la création de la facture : ", error);
+    res.status(500).json({ error: "Erreur lors de la création de la facture" });
+  }
 };
 
+export const deleteFacture = (req, res) =>{
+
+  const clientId = req.params.id;
+  const q = "DELETE FROM invoices WHERE id = ?"
+
+  db.query(q, [clientId], (err, data)=>{
+      if (err) return res.send(err);
+    return res.json(data);
+  })
+}

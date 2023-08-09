@@ -1,5 +1,5 @@
 import express from "express";
-import { deleteAffectation, deleteClient, deleteContrat, deleteEmploye, deleteHoraire, deleteMission, deletePresence, getAffectation, getAllAffectation, getAllHoraire, getAllMission, getAvantage, getClient, getContrat, getContratType, getDuration, getEmploye, getFonction, getHoraire, getMission, getMissionView, getPresence, getSalaireMission, getStatusContrat, postAffectation, postClient, postContrat, postEmploye, postHoraire, postMission, postPresence, putHoraires, updateContrat, updateEmploye, updatePresence, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
+import { deleteAffectation, deleteClient, deleteContrat, deleteEmploye, deleteFacture, deleteHoraire, deleteMission, deletePresence, getAffectation, getAllAffectation, getAllHoraire, getAllMission, getAvantage, getClient, getContrat, getContratType, getDuration, getEmploye, getFacture, getFonction, getHoraire, getMission, getMissionView, getMontantStatus, getPresence, getSalaireMission, getStatusContrat, postAffectation, postClient, postContrat, postEmploye, postFacture, postHoraire, postMission, postPresence, putHoraires, updateContrat, updateEmploye, updatePresence, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
 const router = express.Router()
 
 router.get('/', getEmploye)
@@ -53,6 +53,7 @@ router.post('/presences', postPresence)
 router.delete('/presence/:id', deletePresence)
 router.put('/presencePut', updatePresence)
 
+router.get('/status', getMontantStatus)
 router.get('/facture', getFacture);
 router.post('/factures', postFacture)
 router.delete('/facture/:id', deleteFacture)
