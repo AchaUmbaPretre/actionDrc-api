@@ -741,3 +741,70 @@ export const deleteFacture = (req, res) =>{
     return res.json(data);
   })
 }
+
+export const updateFacture = (req, res) =>{
+  const { id } = req.params;
+  const {employee_id, client_id, date, check_in_time, check_out_time } = req.body;
+
+  const query = `UPDATE attendance SET employee_id = ?, client_id = ?, date = ?, check_in_time = ?, check_out_time = ? WHERE id = ?`;
+  const values = [employee_id, client_id, date, check_in_time, check_out_time, id];
+
+  db.query(query, values, (error, result) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Échec de la mise à jour de presence' });
+    } else {
+      res.status(200).json({ message: 'Presence a ete modifié jour avec succès' });
+    }
+  }) 
+}
+
+export const getPayement = (req, res) =>{
+  const q = "SELECT * FROM payments";
+   
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+export const getPayementView = (req,res) =>{
+  const {id} = req.params;
+  const q = "SELECT * FROM payments where id = ?";
+   
+  db.query(q ,id, (error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
+export const postPayement = (req, res) =>{
+
+  const { invoice_id, payment_date, amount, payment_method } = req.body;
+
+  const sql = 'INSERT INTO payments (invoice_id, payment_date, amount, payment_method) VALUES (?, ?, ?, ?)';
+  const values = [invoice_id, payment_date, amount, payment_method];
+
+  connection.query(sql, values, (err, result) => {
+    if (err) {
+      console.error('Erreur lors de la création du paiement :', err);
+      res.status(500).json({ error: 'Erreur lors de la création du paiement' });
+    } else {
+      console.log('Paiement créé avec succès');
+      res.status(200).json({ message: 'Paiement créé avec succès' });
+    }
+  });
+
+}
+
+export const deletePayement = (req, res) =>{
+
+  const clientId = req.params.id;
+  const q = "DELETE FROM payments WHERE id = ?"
+
+  db.query(q, [clientId], (err, data)=>{
+      if (err) return res.send(err);
+    return res.json(data);
+  })
+}
