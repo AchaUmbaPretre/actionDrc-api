@@ -1,5 +1,5 @@
 import express from "express";
-import { deleteAffectation, deleteClient, deleteContrat, deleteEmploye, deleteFacture, deleteHoraire, deleteMission, deletePayement, deletePresence, getAffectation, getAffectationCount, getAllAffectation, getAllFacture, getAllFactureView, getAllHoraire, getAllHoraireView, getAllMission, getAllMissionView, getAllPresence, getAllPresenceView, getAvantage, getClient, getClientCount, getContrat, getContratCount, getContratType, getDuration, getEmploye, getEmployeCount, getFacture, getFonction, getHoraire, getMission, getMissionView, getMissionWeek, getMontantStatus, getPayement, getPresence, getSalaireMission, getStatusContrat, postAffectation, postClient, postContrat, postEmploye, postFacture, postHoraire, postMission, postPayement, postPresence, putHoraires, updateContrat, updateEmploye, updateMission, updatePresence, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
+import { deleteAffectation, deleteClient, deleteContrat, deleteEmploye, deleteFacture, deleteHoraire, deleteMission, deletePayement, deletePresence, getAffectation, getAffectationCount, getAllAffectation, getAllFacture, getAllFactureView, getAllHoraire, getAllHoraireView, getAllMission, getAllMissionView, getAllPresence, getAllPresenceView, getAvantage, getClient, getClientCount, getContrat, getContratCount, getContratType, getDuration, getEmploye, getEmployeCount, getFacture, getFonction, getHoraire, getMission, getMissionView, getMissionWeek, getMontantStatus, getPayement, getPresence, getSalaireMission, getStatusContrat, postAffectation, postClient, postContrat, postEmploye, postFacture, postHoraire, postMission, postPayement, postPresence, putHoraires, updateContrat, updateEmploye, updateFacture, updateMission, updatePresence, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
 const router = express.Router()
 
 router.get('/', getEmploye)
@@ -58,7 +58,7 @@ router.get('/presenceAll', getAllPresence)
 router.get('/presenceAllView/:id', getAllPresenceView)
 router.post('/presences', postPresence)
 router.delete('/presence/:id', deletePresence)
-router.put('/presencePut', updatePresence)
+router.put('/presencePut/:id', updatePresence)
 
 router.get('/status', getMontantStatus)
 router.get('/facture', getFacture);
@@ -66,10 +66,10 @@ router.get('/factureAll', getAllFacture);
 router.get('/factureAllView/:id', getAllFactureView);
 router.post('/factures', postFacture);
 router.delete('/facture/:id', deleteFacture);
-router.put('/factureUpdate', postFacture)
+router.put('/factureUpdate/:id', updateFacture)
 
 router.get('/payement', getPayement);
-router.get('/payementView', getAllFactureView)
+router.get('/payementView', getAllFactureView);
 router.post('/payementPost', postPayement);
 router.delete('/payement/:id', deletePayement);
 

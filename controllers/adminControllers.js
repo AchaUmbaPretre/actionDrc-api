@@ -744,17 +744,17 @@ export const deleteFacture = (req, res) =>{
 
 export const updateFacture = (req, res) =>{
   const { id } = req.params;
-  const {employee_id, client_id, date, check_in_time, check_out_time } = req.body;
+  const {	client_id, 	invoice_date, due_date, total_amount, status } = req.body;
 
-  const query = `UPDATE attendance SET employee_id = ?, client_id = ?, date = ?, check_in_time = ?, check_out_time = ? WHERE id = ?`;
-  const values = [employee_id, client_id, date, check_in_time, check_out_time, id];
+  const query = `UPDATE invoices SET client_id = ?, invoice_date = ?, due_date = ?, total_amount = ?, status = ? WHERE id = ?`;
+  const values = [client_id, invoice_date, due_date, total_amount, status, id];
 
   db.query(query, values, (error, result) => {
     if (error) {
       console.error(error);
-      res.status(500).json({ error: 'Échec de la mise à jour de presence' });
+      res.status(500).json({ error: 'Échec de la mise à jour de facture' });
     } else {
-      res.status(200).json({ message: 'Presence a ete modifié jour avec succès' });
+      res.status(200).json({ message: 'La facture a ete modifiée jour avec succès' });
     }
   }) 
 }
