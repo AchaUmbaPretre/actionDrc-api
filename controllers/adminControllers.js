@@ -14,7 +14,18 @@ export const getEmploye = (req, res) => {
 
         return res.status(200).json(data);
     })
+  }
+
+export const getEmployeCount = (req, res) => {
+  const q = "SELECT count(*) as total FROM employees";
+
+  db.query(q ,(error, data)=>{
+    if(error) res.status(500).send(error)
+
+    return res.status(200).json(data);
+})
 }
+
 
 export const viewsEmploye = (req, res) =>{
     const {id} = req.params;
@@ -92,6 +103,16 @@ export const getContrat = (req, res) =>{
 
         return res.status(200).json(data);
     })
+}
+
+export const getContratCount = (req, res) => {
+  const q = "SELECT count(*) as total FROM contrats";
+
+  db.query(q ,(error, data)=>{
+    if(error) res.status(500).send(error)
+
+    return res.status(200).json(data);
+})
 }
 
 export const viewsContrat = (req, res) =>{
@@ -190,6 +211,16 @@ export const getClient = (req, res) =>{
     })
 }
 
+export const getClientCount = (req, res) => {
+  const q = "SELECT count(*) as total FROM clients";
+
+  db.query(q ,(error, data)=>{
+    if(error) res.status(500).send(error)
+
+    return res.status(200).json(data);
+})
+}
+
 export const viewsClient = (req, res) =>{
     const {id} = req.params;
     const q = "SELECT * FROM clients where id = ?";
@@ -286,6 +317,15 @@ export const getAffectation = (req,res) =>{
         return res.status(200).json(data);
     })
 }
+export const getAffectationCount = (req, res) => {
+  const q = "SELECT count(*) as total FROM affectations";
+
+  db.query(q ,(error, data)=>{
+    if(error) res.status(500).send(error)
+
+    return res.status(200).json(data);
+})
+}
 
 export const getAllAffectation = (req, res) => {
     const q = "SELECT emp1.id, emp1.first_name, emp1.last_name, emp1.skills, fonctions.nom, fonctions.salaire, contrats.end_date FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonctions ON affectations.fonction_id = fonctions.id INNER JOIN contrats ON affectations.contrat_id = contrats.id";
@@ -320,13 +360,24 @@ export const getMission = (req,res) =>{
 }
 
 export const getMissionView = (req,res) =>{
+    const {id} = req.params;
     const q = "SELECT * FROM mission where id = ?";
      
-    db.query(q ,(error, data)=>{
+    db.query(q ,id, (error, data)=>{
         if(error) res.status(500).send(error)
 
         return res.status(200).json(data);
     })
+}
+
+export const getMissionWeek = (req,res) =>{
+  const q = "SELECT * FROM weekdays";
+   
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
 }
 
 export const postMission = (req, res) => {
@@ -337,8 +388,6 @@ export const postMission = (req, res) => {
   const dateSortant = moment(req.body.dateSortant, 'YYYY-MM-DD');
 
   const duree = Math.ceil(dateSortant.diff(dateEntrant, 'months'));
-
-  console.log(req.body.montant, duree);
 
   const values = [
     req.body.agent_id,
@@ -357,6 +406,23 @@ export const postMission = (req, res) => {
     }
   });
 };
+
+export const updateMission = (req, res) =>{
+  const { id } = req.params;
+  const {agent_id, client_id, dateEntrant, dateSortant, duree, montant } = req.body;
+
+  const query = `UPDATE mission SET agent_id = ?, client_id = ?, dateEntrant = ?, dateSortant = ?, duree = ?, montant = ? WHERE id = ?`;
+  const values = [agent_id , client_id, dateEntrant, dateSortant, duree, montant, id];
+
+  db.query(query, values, (error, result) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Échec de la mise à jour de mission' });
+    } else {
+      res.status(200).json({ message: 'Mission a ete modifié avec succès' });
+    }
+  }) 
+}
 
 
 export const deleteMission = (req, res) =>{
@@ -393,12 +459,23 @@ export const getSalaireMission = (req, res)=>{
 }
 
 export const getAllMission = (req, res) => {
-    const q = "SELECT emp1.id, emp1.first_name, fonctions.nom, fonctions.salaire, contrats.end_date FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonctions ON affectations.fonction_id = fonctions.id INNER JOIN contrats ON affectations.contrat_id = contrats.id";
+    const q = "SELECT dateEntrant, dateSortant, duree, montant, mission.id, emp1.first_name, emp2.company_name FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id";
     db.query(q, (error, data) => {
       if (error) {
         return res.status(500).send(error);
       }
       
+      return res.status(200).json(data);
+    });
+  }
+
+  export const getAllMissionView = (req, res) => {
+    const {id} = req.params;
+    const q = "SELECT dateEntrant, dateSortant, duree, montant, mission.id, emp1.first_name, emp2.company_name FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id WHERE mission.id = ?";
+    db.query(q, id, (error, data) => {
+      if (error) {
+        return res.status(500).send(error);
+      }
       return res.status(200).json(data);
     });
   }
@@ -429,6 +506,29 @@ export const postHoraire = (req, res) => {
 }
 
 export const getAllHoraire = (req, res) => {
+  const q = "SELECT work_schedule.id, start_date, end_date, emp3.days, start_time, end_time, emp1.first_name, emp2.company_name FROM work_schedule INNER JOIN employees AS emp1 ON work_schedule.employee_id  = emp1.id INNER JOIN clients AS emp2 ON work_schedule.client_id = emp2.id INNER JOIN weekdays AS emp3 ON work_schedule.weekday = emp3.id";
+  db.query(q, (error, data) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    
+    return res.status(200).json(data);
+  });
+}
+
+export const getAllHoraireView = (req, res) => {
+  const {id} = req.params;
+  const q = "SELECT work_schedule.id, start_date, end_date, emp3.days, start_time, end_time, emp1.first_name, emp2.company_name FROM work_schedule INNER JOIN employees AS emp1 ON work_schedule.employee_id  = emp1.id INNER JOIN clients AS emp2 ON work_schedule.client_id = emp2.id INNER JOIN weekdays AS emp3 ON work_schedule.weekday = emp3.id where work_schedule.id = ?";
+  db.query(q,id, (error, data) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    
+    return res.status(200).json(data);
+  });
+}
+
+/* export const getAllHoraire = (req, res) => {
 
     const query = `SELECT * FROM work_schedule WHERE type = 'variable'`;
   
@@ -440,7 +540,7 @@ export const getAllHoraire = (req, res) => {
         res.status(200).json(results);
       }
     });
-  };
+  }; */
 
   export const deleteHoraire = (req, res) =>{
 
@@ -478,6 +578,29 @@ export const getPresence = (req,res) => {
 
       return res.status(200).json(data);
   })
+}
+
+export const getAllPresence = (req, res) => {
+  const q = "SELECT attendance.id , date, check_in_time, check_out_time, emp1.first_name, emp2.company_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id  = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id";
+  db.query(q, (error, data) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    
+    return res.status(200).json(data);
+  });
+}
+
+export const getAllPresenceView = (req, res) => {
+  const {id} = req.params;
+  const q = "SELECT attendance.id , date, check_in_time, check_out_time, emp1.first_name, emp2.company_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id  = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id where attendance.id = ?";
+  db.query(q,id, (error, data) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    
+    return res.status(200).json(data);
+  });
 }
 
 export const postPresence = (req, res)=>{
@@ -562,6 +685,29 @@ export const getMontantStatus = (req, res) => {
 
       return res.status(200).json(data);
   })
+}
+
+export const getAllFacture = (req, res) => {
+  const q = "SELECT invoices.id, invoice_date, due_date, total_amount,status , emp2.company_name FROM invoices INNER JOIN clients AS emp2 ON invoices.client_id = emp2.id";
+  db.query(q, (error, data) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    
+    return res.status(200).json(data);
+  });
+}
+
+export const getAllFactureView = (req, res) => {
+  const {id} = req.params;
+  const q = "SELECT invoices.id, invoice_date, due_date, total_amount,status , emp2.company_name FROM invoices INNER JOIN clients AS emp2 ON invoices.client_id = emp2.id where invoices.id = ?";
+  db.query(q,id, (error, data) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    
+    return res.status(200).json(data);
+  });
 }
 
 export const postFacture = async (req, res) => {
