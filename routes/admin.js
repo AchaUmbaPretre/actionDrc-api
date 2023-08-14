@@ -33,7 +33,7 @@ router.get('/affectationCount', getAffectationCount)
 router.post('/affectations', postAffectation)
 router.get('/affectation', getAffectation)
 router.get('/allaffectation', getAllAffectation)
-router.delete('/deleteAff', deleteAffectation)
+router.delete('/deleteAff/:id', deleteAffectation)
 
 router.get('/mission', getMission)
 router.get('/missionWeek', getMissionWeek)

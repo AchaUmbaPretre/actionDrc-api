@@ -328,7 +328,7 @@ export const getAffectationCount = (req, res) => {
 }
 
 export const getAllAffectation = (req, res) => {
-    const q = "SELECT emp1.id, emp1.first_name, emp1.last_name, emp1.skills, fonctions.nom, fonctions.salaire, contrats.end_date FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonctions ON affectations.fonction_id = fonctions.id INNER JOIN contrats ON affectations.contrat_id = contrats.id";
+    const q = "SELECT affectations.id, emp1.first_name, emp1.last_name, emp1.skills, fonctions.nom, fonctions.salaire, contrats.end_date FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonctions ON affectations.fonction_id = fonctions.id INNER JOIN contrats ON affectations.contrat_id = contrats.id";
     db.query(q, (error, data) => {
       if (error) {
         return res.status(500).send(error);
@@ -341,7 +341,7 @@ export const getAllAffectation = (req, res) => {
   export const deleteAffectation = (req, res) =>{
 
     const clientId = req.params.id;
-    const q = "DELETE FROM affectation WHERE id = ?"
+    const q = "DELETE FROM affectations WHERE id = ?"
 
     db.query(q, [clientId], (err, data)=>{
         if (err) return res.send(err);
