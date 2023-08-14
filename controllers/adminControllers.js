@@ -779,24 +779,34 @@ export const getPayementView = (req,res) =>{
   })
 }
 
-export const postPayement = (req, res) =>{
+export const getPayementAll = (req,res) =>{
+  const q =  'SELECT payments.*, invoices.status FROM payments INNER JOIN invoices ON payments.invoice_id = invoices.id';
+      db.query(q,(error, data)=>{
+        if(error) res.status(500).send(error)
 
+      return res.status(200).json(data);
+      })
+}
+
+export const postPayement = (req, res) => {
   const { invoice_id, payment_date, amount, payment_method } = req.body;
+  console.log(req.body);
 
-  const sql = 'INSERT INTO payments (invoice_id, payment_date, amount, payment_method) VALUES (?, ?, ?, ?)';
+  const q = 'INSERT INTO payments (invoice_id, payment_date, amount, payment_method) VALUES (?, ?, ?, ?)';
   const values = [invoice_id, payment_date, amount, payment_method];
 
-  connection.query(sql, values, (err, result) => {
+  db.query(q, values, (err, result) => {
     if (err) {
       console.error('Erreur lors de la création du paiement :', err);
       res.status(500).json({ error: 'Erreur lors de la création du paiement' });
     } else {
+      const paymentId = result.insertId;
+
       console.log('Paiement créé avec succès');
-      res.status(200).json({ message: 'Paiement créé avec succès' });
+      res.status(200).json({ message: 'Paiement créé avec succès', payment_id: paymentId });
     }
   });
-
-}
+};
 
 export const deletePayement = (req, res) =>{
 
