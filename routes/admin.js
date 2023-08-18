@@ -1,5 +1,5 @@
 import express from "express";
-import { deleteAffectation, deleteClient, deleteContrat, deleteEmploye, deleteFacture, deleteHoraire, deleteMission, deletePayement, deletePresence, getAffectation, getAffectationCount, getAllAffectation, getAllFacture, getAllFactureView, getAllHoraire, getAllHoraireView, getAllMission, getAllMissionView, getAllPresence, getAllPresenceView, getAvantage, getClient, getClientCount, getContrat, getContratCount, getContratType, getDuration, getEmploye, getEmployeCount, getFacture, getFonction, getHoraire, getMission, getMissionView, getMissionWeek, getMontantStatus, getPayement, getPayementAll, getPresence, getSalaireMission, getStatusContrat, postAffectation, postClient, postContrat, postEmploye, postFacture, postHoraire, postMission, postPayement, postPresence, putHoraires, updateContrat, updateEmploye, updateFacture, updateMission, updatePresence, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
+import { countPresence, deleteAffectation, deleteClient, deleteContrat, deleteEmploye, deleteFacture, deleteHoraire, deleteMission, deletePayement, deletePresence, getAffectation, getAffectationCount, getAllAffectation, getAllFacture, getAllFactureView, getAllHoraire, getAllHoraireView, getAllMission, getAllMissionView, getAllPresence, getAllPresenceView, getAvantage, getClient, getClientCount, getCompetence, getContrat, getContratCount, getContratType, getDuration, getEmploye, getEmployeCount, getFacture, getFonction, getHoraire, getMission, getMissionView, getMissionWeek, getMontantStatus, getNiveau, getPayement, getPayementAll, getPresence, getSalaireMission, getStatus, getStatusContrat, getType, postAffectation, postClient, postContrat, postEmploye, postFacture, postHoraire, postMission, postPayement, postPresence, putHoraires, updateContrat, updateEmploye, updateFacture, updateMission, updatePresence, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
 const router = express.Router()
 
 router.get('/', getEmploye)
@@ -8,6 +8,11 @@ router.get('/count', getEmployeCount)
 router.post('/employe', postEmploye)
 router.delete('/employe/:id', deleteEmploye)
 router.put('/employe/:id', updateEmploye)
+
+router.get('/competence', getCompetence)
+router.get('/niveau', getNiveau)
+router.get('/typepiece', getType)
+router.get('/status', getStatus)
 
 router.get('/contrat', getContrat)
 router.get('/contratCount', getContratCount)
@@ -56,6 +61,7 @@ router.put('/horaires/:id',putHoraires)
 router.get('/presence', getPresence)
 router.get('/presenceAll', getAllPresence)
 router.get('/presenceAllView/:id', getAllPresenceView)
+router.get('/presenceCount/:id', countPresence)
 router.post('/presences', postPresence)
 router.delete('/presence/:id', deletePresence)
 router.put('/presencePut/:id', updatePresence)

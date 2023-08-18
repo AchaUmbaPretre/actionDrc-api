@@ -26,6 +26,30 @@ export const getEmployeCount = (req, res) => {
 })
 }
 
+/* export const getAllEmploye = (req, res) => {
+  const q = "SELECT *, emp1.nom_type, competences.nom, niveauetude.titre, status.nom_status FROM employees INNER JOIN type_piece AS emp1 ON employees.identification_type = emp1.id INNER JOIN competences ON employees.skills = competences.id INNER JOIN niveauetude ON employees.certifications = niveauetude.id INNER JOIN status ON employees.employment_status = status.id";
+  
+  db.query(q, (error, data) => {
+    if (error) {
+      console.error('Erreur lors de la récupération des employés :', error);
+      return res.status(500).json({ error: 'Erreur lors de la récupération des employés' });
+    }
+    return res.status(200).json(data);
+  });
+} */
+
+/* export const getAllEmployeeView = (req, res) => {
+  const q = "SELECT *,employees.id, emp1.nom_type, competences.nom, niveauetude.titre, status.nom_status FROM employees INNER JOIN type_piece AS emp1 ON employees.identification_type = emp1.id INNER JOIN competences ON employees.skills = competences.id INNER JOIN niveauetude ON employees.certifications = niveauetude.id INNER JOIN status ON employees.employment_status = status.id where employees.id = ?";
+  
+  db.query(q, (error, data) => {
+    if (error) {
+      console.error('Erreur lors de la récupération des employés :', error);
+      return res.status(500).json({ error: 'Erreur lors de la récupération des employés' });
+    }
+    return res.status(200).json(data);
+  });
+} */
+
 
 export const viewsEmploye = (req, res) =>{
     const {id} = req.params;
@@ -93,6 +117,46 @@ export const updateEmploye = (req, res)=> {
         if (err) return res.send(err);
         return res.json(data);
       });
+}
+
+export const getCompetence = (req, res) =>{
+  const q = "SELECT * FROM competences";
+     
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
+export const getNiveau = (req, res) =>{
+  const q = "SELECT * FROM niveauetude";
+     
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
+export const getType = (req, res) =>{
+  const q = "SELECT * FROM type_piece";
+     
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
+export const getStatus = (req, res) =>{
+  const q = "SELECT * FROM status";
+     
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
 }
 
 export const getContrat = (req, res) =>{
@@ -491,9 +555,13 @@ export const getAllMission = (req, res) => {
   }
 export const postHoraire = (req, res) => {
     const { employee_id, client_id, start_date, end_date, weekday, start_time, end_time } = req.body;
+
+    const formattedStartTime = start_time.substring(0, 5);
+    const formattedEndTime = end_time.substring(0, 5);
+    console.log(formattedStartTime)
   
     const query = `INSERT INTO work_schedule (employee_id , client_id, start_date, end_date, weekday, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    const values = [employee_id, client_id, start_date, end_date, weekday, start_date,start_time, end_time];
+    const values = [employee_id, client_id, start_date, end_date, weekday ,formattedStartTime, formattedEndTime];
   
     db.query(query, values, (error, result) => {
       if (error) {
@@ -581,7 +649,7 @@ export const getPresence = (req,res) => {
 }
 
 export const getAllPresence = (req, res) => {
-  const q = "SELECT attendance.id , date, check_in_time, check_out_time, emp1.first_name, emp2.company_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id  = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id";
+  const q = "SELECT emp1.id , date, check_in_time, check_out_time, emp1.first_name, emp2.company_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id  = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id";
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
@@ -636,6 +704,24 @@ export const postPresence = (req, res)=>{
       }
     }
   })
+}
+
+export const countPresence = (req, res) => {
+
+  const employeeId = req.params.id;
+  console.log(employeeId)
+  const q = 'SELECT COUNT(*) AS attendanceCount FROM attendance WHERE employee_id = ?';
+
+  db.query(q,[employeeId], (error, results) => {
+    if (error) {
+      console.error('Erreur lors du comptage des présences :', error);
+      res.status(500).json({ error: 'Erreur lors du comptage des présences' });
+    } else {
+      const attendanceCount = results[0].attendanceCount;
+      res.json({ attendanceCount });
+    }
+  })
+
 }
 
 export const deletePresence = (req, res) =>{

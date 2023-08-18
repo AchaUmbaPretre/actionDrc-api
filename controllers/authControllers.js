@@ -51,13 +51,14 @@ export const login = (req, res)=>{
             success: false
         },);
 
-        const token = jwt.sign({ id: data[0].id }, process.env.JWT);
+        const token = jwt.sign({ id: data[0].id }, process.env.JWT,{ expiresIn: '24h' });
         const {password, ...other} = data[0];
 
         
 return  res
         .cookie("access_token", token ,{
             httpOnly: true,
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
         })
         .status(200)
         .json(other)
