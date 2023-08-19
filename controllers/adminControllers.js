@@ -876,7 +876,6 @@ export const getPayementAll = (req,res) =>{
 
 export const postPayement = (req, res) => {
   const { invoice_id, payment_date, amount, payment_method } = req.body;
-  console.log(req.body);
 
   const q = 'INSERT INTO payments (invoice_id, payment_date, amount, payment_method) VALUES (?, ?, ?, ?)';
   const values = [invoice_id, payment_date, amount, payment_method];

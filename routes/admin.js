@@ -66,7 +66,7 @@ router.post('/presences', postPresence)
 router.delete('/presence/:id', deletePresence)
 router.put('/presencePut/:id', updatePresence)
 
-router.get('/status', getMontantStatus)
+router.get('/statusFacture', getMontantStatus);
 router.get('/facture', getFacture);
 router.get('/factureAll', getAllFacture);
 router.get('/factureAllView/:id', getAllFactureView);
