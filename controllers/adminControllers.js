@@ -649,12 +649,12 @@ export const getPresence = (req,res) => {
 }
 
 export const getAllPresence = (req, res) => {
-  const q = "SELECT emp1.id , date, check_in_time, check_out_time, emp1.first_name, emp2.company_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id  = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id";
+  const q = "SELECT attendance.id, date, check_in_time, check_out_time, emp1.id AS emp1_id, emp1.first_name, emp2.company_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id";
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
     }
-    
+
     return res.status(200).json(data);
   });
 }
@@ -709,7 +709,6 @@ export const postPresence = (req, res)=>{
 export const countPresence = (req, res) => {
 
   const employeeId = req.params.id;
-  console.log(employeeId)
   const q = 'SELECT COUNT(*) AS attendanceCount FROM attendance WHERE employee_id = ?';
 
   db.query(q,[employeeId], (error, results) => {
