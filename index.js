@@ -6,6 +6,7 @@ import adminRoute from './routes/admin.js'
 import usersRoute from './routes/users.js'
 import multer from "multer"
 
+
 const app = express();
 
 app.use(cors());

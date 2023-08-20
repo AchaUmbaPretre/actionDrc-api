@@ -1,10 +1,11 @@
 import express from "express";
-import { countPresence, deleteAffectation, deleteClient, deleteContrat, deleteEmploye, deleteFacture, deleteHoraire, deleteMission, deletePayement, deletePresence, getAffectation, getAffectationCount, getAllAffectation, getAllFacture, getAllFactureView, getAllHoraire, getAllHoraireView, getAllMission, getAllMissionView, getAllPresence, getAllPresenceView, getAvantage, getClient, getClientCount, getCompetence, getContrat, getContratCount, getContratType, getDuration, getEmploye, getEmployeCount, getFacture, getFonction, getHoraire, getMission, getMissionView, getMissionWeek, getMontantStatus, getNiveau, getPayement, getPayementAll, getPresence, getSalaireMission, getStatus, getStatusContrat, getType, postAffectation, postClient, postContrat, postEmploye, postFacture, postHoraire, postMission, postPayement, postPresence, putHoraires, updateContrat, updateEmploye, updateFacture, updateMission, updatePresence, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
+import { countPresence, deleteAffectation, deleteClient, deleteContrat, deleteEmploye, deleteFacture, deleteHoraire, deleteMission, deletePayement, deletePresence, getAffectation, getAffectationCount, getAllAffectation, getAllContrat, getAllFacture, getAllFactureView, getAllHoraire, getAllHoraireView, getAllMission, getAllMissionView, getAllPresence, getAllPresenceView, getAvantage, getClient, getClientCount, getCompetence, getContrat, getContratCount, getContratType, getDuration, getEmploye, getEmployeCount, getFacture, getFonction, getHoraire, getMission, getMissionView, getMissionWeek, getMontantStatus, getNiveau, getPayement, getPayementAll, getPresence, getSalaireMission, getStatus, getStatusContrat, getType, postAffectation, postClient, postContrat, postEmploye, postFacture, postHoraire, postMission, postPayement, postPresence, putHoraires, updateContrat, updateEmploye, updateFacture, updateMission, updatePresence, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
 const router = express.Router()
 
 router.get('/', getEmploye)
 router.get('/views/:id', viewsEmploye)
 router.get('/count', getEmployeCount)
+router.get('/')
 router.post('/employe', postEmploye)
 router.delete('/employe/:id', deleteEmploye)
 router.put('/employe/:id', updateEmploye)
@@ -14,7 +15,7 @@ router.get('/niveau', getNiveau)
 router.get('/typepiece', getType)
 router.get('/status', getStatus)
 
-router.get('/contrat', getContrat)
+router.get('/contrat', getAllContrat)
 router.get('/contratCount', getContratCount)
 router.get('/contrat/views/:id', viewsContrat)
 router.get('/avantages', getAvantage)

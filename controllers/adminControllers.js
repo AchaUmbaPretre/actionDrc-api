@@ -49,6 +49,23 @@ export const getEmployeCount = (req, res) => {
     return res.status(200).json(data);
   });
 } */
+export const getEmployeJoin = (req, res) => {
+  const q = "SELECT employees.*, affectations.emploie_id AS nom_emploi FROM employees JOIN affectations ON employees.id = affectations.employee_id";
+  
+  db.query(q, (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Erreur lors de la récupération des employés avec leurs affectations");
+    } else {
+      res.json(results);
+    }
+  });
+};
+
+/* SELECT Emploi.*, Compagnie.nom AS nom_compagnie
+FROM Emploi
+JOIN Compagnie ON Emploi.id_compagnie = Compagnie.id
+WHERE Emploi.id = <id_emploi></id_emploi> */
 
 
 export const viewsEmploye = (req, res) =>{
@@ -169,6 +186,17 @@ export const getContrat = (req, res) =>{
     })
 }
 
+export const getAllContrat = (req, res) => {
+  const q = "SELECT contrats.*, emp1.company_name FROM contrats INNER JOIN clients AS emp1 ON contrats.client_id = emp1.id";
+  db.query(q, (error, data) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    
+    return res.status(200).json(data);
+  });
+}
+
 export const getContratCount = (req, res) => {
   const q = "SELECT count(*) as total FROM contrats";
 
@@ -220,9 +248,11 @@ export const getStatusContrat = (req, res) =>{
 }
 
 export const postContrat = (req, res) =>{
-    const q = 'INSERT INTO contrats(`contract_type`,`start_date`,`end_date`,`date_engagement`,`hourly_rate`,`benefits`,`contract_status`) VALUES(?)';
+    const q = 'INSERT INTO contrats(`contract_type`,`client_id`, `start_date`,`end_date`,`date_engagement`,`hourly_rate`,`benefits`,`contract_status`) VALUES(?)';
+    console.log(req.body)
     const values = [
         req.body.contract_type,
+        req.body.client_id,
         req.body.start_date,
         req.body.end_date,
         req.body.date_engagement,
