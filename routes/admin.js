@@ -1,5 +1,5 @@
 import express from "express";
-import { countPresence, deleteAffectation, deleteClient, deleteContrat, deleteEmploye, deleteFacture, deleteHoraire, deleteMission, deletePayement, deletePresence, getAffectation, getAffectationCount, getAllAffectation, getAllContrat, getAllFacture, getAllFactureView, getAllHoraire, getAllHoraireView, getAllMission, getAllMissionView, getAllPresence, getAllPresenceView, getAvantage, getClient, getClientCount, getCompetence, getContrat, getContratCount, getContratType, getDuration, getEmploye, getEmployeCount, getFacture, getFonction, getHoraire, getMission, getMissionView, getMissionWeek, getMontantStatus, getNiveau, getPayement, getPayementAll, getPresence, getSalaireMission, getStatus, getStatusContrat, getType, postAffectation, postClient, postContrat, postEmploye, postFacture, postHoraire, postMission, postPayement, postPresence, putHoraires, updateContrat, updateEmploye, updateFacture, updateMission, updatePresence, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
+import { countPresence, deleteAffectation, deleteClient, deleteContrat, deleteEmploye, deleteFacture, deleteHoraire, deleteMission, deletePayement, deletePresence, getAffectation, getAffectationCount, getAllAffectation, getAllContrat, getAllFacture, getAllFactureView, getAllHoraire, getAllHoraireView, getAllMission, getAllMissionView, getAllPresence, getAllPresenceView, getAvantage, getClient, getClientCount, getCompetence, getContrat, getContratCount, getContratType, getDuration, getEmploye, getEmployeCount, getFacture, getFonction, getFonctionDetail, getHoraire, getMission, getMissionView, getMissionWeek, getMontantStatus, getNiveau, getPayement, getPayementAll, getPresence, getSalaireMission, getStatus, getStatusContrat, getType, postAffectation, postClient, postContrat, postEmploye, postFacture, postHoraire, postMission, postPayement, postPresence, putHoraires, updateContrat, updateEmploye, updateEmployeFonction, updateFacture, updateMission, updatePresence, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
 const router = express.Router()
 
 router.get('/', getEmploye)
@@ -35,6 +35,10 @@ router.put('/client/:id', updateContrat)
 
 
 router.get('/fonction', getFonction)
+router.get('/fonctionDetail/:id', getFonctionDetail)
+router.put('/employeFonctionPut/:id', updateEmployeFonction)
+
+
 router.get('/affectationCount', getAffectationCount)
 router.post('/affectations', postAffectation)
 router.get('/affectation', getAffectation)

@@ -247,25 +247,33 @@ export const getStatusContrat = (req, res) =>{
     })
 }
 
-export const postContrat = (req, res) =>{
-    const q = 'INSERT INTO contrats(`contract_type`,`client_id`, `start_date`,`end_date`,`date_engagement`,`hourly_rate`,`benefits`,`contract_status`) VALUES(?)';
-    console.log(req.body)
-    const values = [
-        req.body.contract_type,
-        req.body.client_id,
-        req.body.start_date,
-        req.body.end_date,
-        req.body.date_engagement,
-        req.body.hourly_rate,
-        req.body.benefits,
-        req.body.contract_status,
-    ]
+export const postContrat = (req, res) => {
+  const q = 'INSERT INTO contrats(`contract_type`, `client_id`, `start_date`, `end_date`, `contract_status`) VALUES(?, ?, ?, ?, ?)';
 
-    db.query(q, [values], (error,data)=>{
-        if(error) res.status(500).json(error)
-        return res.json('processus reussi');
-    })
-}
+  const { contract_type, client_id, start_date, end_date } = req.body;
+  const startDate = new Date(start_date);
+  const endDate = new Date(end_date);
+
+  let status = '';
+
+  if (startDate > endDate) {
+    status = 'Résilié';
+  } else if (startDate > new Date()) {
+    status = 'En attente';
+  } else {
+    status = 'En cours';
+  }
+
+  const values = [contract_type, client_id, start_date, end_date, status];
+
+  db.query(q, values, (error, data) => {
+    if (error) {
+      res.status(500).json(error);
+    } else {
+      res.json('Processus réussi');
+    }
+  });
+};
 
 export const deleteContrat = (req, res) =>{
     const employeId = req.params.id;
@@ -387,6 +395,42 @@ export const getFonction = (req, res) =>{
         return res.status(200).json(data);
     })
 }
+
+export const getFonctionDetail = (req, res) =>{
+  const {id} = req.params;
+  const q = "SELECT * FROM fonctions WHERE id = ?";
+   
+  db.query(q ,id, (error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
+export const updateEmployeFonction = (req, res)=> {
+  const employeId = req.params.id;
+  const q = "UPDATE employees SET `first_name`= ?, `last_name`= ?, `date_of_birth`= ?, `gender`= ?, `address`= ?,`phone_number`= ?, `email`= ?, `identification_number`= ?, `identification_type`= ?,`skills`= ?, `certifications`= ?, `employment_status`= ? WHERE id = ?"
+  const values = [
+      req.body.first_name,
+      req.body.last_name,
+      req.body.date_of_birth,
+      req.body.gender,
+      req.body.address,
+      req.body.phone_number,
+      req.body.email,
+      req.body.identification_number,
+      req.body.identification_type,
+      req.body.skills,
+      req.body.certifications,
+      req.body.employment_status
+  ];
+  db.query(q, [...values,employeId], (err, data) => {
+      if (err) return res.send(err);
+      return res.json(data);
+    });
+}
+
+
 
 export const postAffectation = (req, res) =>{
     const q = 'INSERT INTO affectations(`fonction_id`,`emploie_id`,`contrat_id`) VALUES(?)';
