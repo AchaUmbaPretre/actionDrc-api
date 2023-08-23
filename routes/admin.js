@@ -36,7 +36,7 @@ router.put('/client/:id', updateContrat)
 
 router.get('/fonction', getFonction)
 router.get('/fonctionDetail/:id', getFonctionDetail)
-router.get('/emploieDispo',getEmploieDispo )
+router.get('/emploieDispo', getEmploieDispo)
 router.put('/employeFonctionPut/:id', updateEmployeFonction)
 
 
