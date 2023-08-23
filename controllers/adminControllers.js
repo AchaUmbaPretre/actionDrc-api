@@ -68,7 +68,7 @@ JOIN Compagnie ON Emploi.id_compagnie = Compagnie.id
 WHERE Emploi.id = <id_emploi></id_emploi> */
 
 
-export const viewsEmploye = (req, res) =>{
+/* export const viewsEmploye = (req, res) =>{
     const {id} = req.params;
     const q = "SELECT * FROM employees where id = ?";
 
@@ -76,10 +76,29 @@ export const viewsEmploye = (req, res) =>{
         if(error) res.status(500).send(error)
         return res.status(200).json(data);
     })
-}
+} */
+
+export const viewsEmploye = (req, res) => {
+  const { id } = req.params;
+  const q = `
+    SELECT employees.*, clients.company_name AS nom_client
+    FROM employees
+    LEFT JOIN contrats ON employees.contrat_id = contrats.id
+    LEFT JOIN clients ON contrats.client_id = clients.id
+    WHERE employees.id = ?
+  `;
+  
+  db.query(q, id, (error, data) => {
+    if (error) {
+      res.status(500).send(error);
+    } else {
+      res.status(200).json(data);
+    }
+  });
+};
 
 export const postEmploye = (req, res) => {
-    const q = 'INSERT INTO employees(`first_name`,`last_name`,`date_of_birth`,`gender`,`address`,`phone_number`,`email`,`identification_number`,`identification_type`,`skills`, `certifications`, `employment_status`,`contrat_id`, `source`) VALUES(?)';
+    const q = 'INSERT INTO employees(`first_name`,`last_name`,`date_of_birth`,`gender`,`address`,`phone_number`,`email`,`identification_number`,`etat_civil`,`number_inpp`,`number_cnss`,`nombre_enfant`,`identification_type`,`skills`, `certifications`, `employment_status`,`contrat_id`, `source`) VALUES(?)';
     const values = [
         req.body.first_name,
         req.body.last_name,
@@ -89,6 +108,10 @@ export const postEmploye = (req, res) => {
         req.body.phone_number,
         req.body.email,
         req.body.identification_number,
+        req.body.etat_civil,
+        req.body.number_inpp,
+        req.body.number_cnss,
+        req.body.nombre_enfant,
         req.body.identification_type,
         req.body.skills,
         req.body.certifications,
@@ -99,6 +122,7 @@ export const postEmploye = (req, res) => {
 
     db.query(q, [values], (error,data)=>{
         if(error) res.status(500).json(error)
+        console.log(error)
         return res.json('processus reussi');
     })
 }
@@ -115,7 +139,7 @@ export const deleteEmploye = (req, res)=>{
 
 export const updateEmploye = (req, res)=> {
     const employeId = req.params.id;
-    const q = "UPDATE employees SET `first_name`= ?, `last_name`= ?, `date_of_birth`= ?, `gender`= ?, `address`= ?,`phone_number`= ?, `email`= ?, `identification_number`= ?, `identification_type`= ?,`skills`= ?, `certifications`= ?, `employment_status`= ? WHERE id = ?"
+    const q = "UPDATE employees SET `first_name`= ?, `last_name`= ?, `date_of_birth`= ?, `gender`= ?, `address`= ?,`phone_number`= ?, `email`= ?, `identification_number`= ?, `etat_civil`= ?, `number_inpp`= ?, `number_cnss`= ?, `nombre_enfant`= ?, `identification_type`= ?,`skills`= ?, `certifications`= ?, `employment_status`= ? WHERE id = ?"
     const values = [
         req.body.first_name,
         req.body.last_name,
@@ -125,6 +149,10 @@ export const updateEmploye = (req, res)=> {
         req.body.phone_number,
         req.body.email,
         req.body.identification_number,
+        req.body.etat_civil,
+        req.body.number_inpp,
+        req.body.number_cnss,
+        req.body.nombre_enfant,
         req.body.identification_type,
         req.body.skills,
         req.body.certifications,
@@ -407,28 +435,40 @@ export const getFonctionDetail = (req, res) =>{
   })
 }
 
+export const getEmploieDispo = (req, res) =>{
+  const q = "SELECT employees.*, IF(contrats.end_date IS NULL OR contrats.end_date < CURDATE(), 'disponible', 'indisponible') AS disponibilite FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id"
+    db.query(q, (error, results)=>{
+      if (error) {
+        console.error(error);
+        res.status(500).send('Erreur serveur');
+      } else {
+        const employees = results.map((employee) => ({
+          id: employee.id,
+          nom: employee.first_name,
+          prenom: employee.last_name,
+          skills: employee.skills,
+          email: employee.email,
+          contrat_id : employee.contrat_id,
+          disponibilite: employee.disponibilite,
+        }));
+        res.json(employees);
+      }
+    })
+}
+
+
 export const updateEmployeFonction = (req, res)=> {
   const employeId = req.params.id;
-  const q = "UPDATE employees SET `first_name`= ?, `last_name`= ?, `date_of_birth`= ?, `gender`= ?, `address`= ?,`phone_number`= ?, `email`= ?, `identification_number`= ?, `identification_type`= ?,`skills`= ?, `certifications`= ?, `employment_status`= ? WHERE id = ?"
+  const q = "UPDATE employees SET contrat_id = ? WHERE id = ?"
   const values = [
-      req.body.first_name,
-      req.body.last_name,
-      req.body.date_of_birth,
-      req.body.gender,
-      req.body.address,
-      req.body.phone_number,
-      req.body.email,
-      req.body.identification_number,
-      req.body.identification_type,
-      req.body.skills,
-      req.body.certifications,
-      req.body.employment_status
+      req.body.contrat_id
   ];
   db.query(q, [...values,employeId], (err, data) => {
       if (err) return res.send(err);
       return res.json(data);
     });
 }
+
 
 
 
