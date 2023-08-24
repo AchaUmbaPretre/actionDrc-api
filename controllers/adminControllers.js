@@ -341,6 +341,26 @@ export const getClient = (req, res) =>{
     })
 }
 
+export const getProvince = (req, res) =>{
+  const q = "SELECT * FROM province";
+   
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
+export const getPays = (req, res) =>{
+  const q = "SELECT * FROM pays";
+   
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
 export const getClientCount = (req, res) => {
   const q = "SELECT count(*) as total FROM clients";
 
@@ -363,7 +383,7 @@ export const viewsClient = (req, res) =>{
 }
 
 export const postClient= (req, res) =>{
-    const q = 'INSERT INTO clients(`company_name`,`address`,`phone_number`,`contact_name`,`contact_email`,`rccm`,`idnate`,`contact_phone`) VALUES(?)';
+    const q = 'INSERT INTO clients(`company_name`,`address`,`phone_number`,`contact_name`,`contact_email`,`rccm`,`idnate`,`contact_phone`,`apr`,`province`,`pays`) VALUES(?)';
     const values = [
         req.body.company_name,
         req.body.address,
@@ -373,10 +393,14 @@ export const postClient= (req, res) =>{
         req.body.rccm,
         req.body.idnate,
         req.body.contact_phone,
+        req.body.apr,
+        req.body.province,
+        req.body.pays,
     ]
 
     db.query(q, [values], (error,data)=>{
         if(error) res.status(500).json(error)
+        console.log(error)
         return res.json('processus reussi');
     })
 }
@@ -395,7 +419,7 @@ export const deleteClient = (req, res) =>{
 
 export const updateClient = (req, res)=> {
     const employeId = req.params.id;
-    const q = "UPDATE clients SET `company_name`= ?, `address`= ?, `phone_number`= ?, `contact_name`= ?, `address`= ?,`phone_number`= ?, `contact_email`= ?, `rccm`= ?, `idnate`= ?,`contact_phone`= ? WHERE id = ?"
+    const q = "UPDATE clients SET `company_name`= ?, `address`= ?, `phone_number`= ?, `contact_name`= ?, `address`= ?,`phone_number`= ?, `contact_email`= ?, `rccm`= ?, `idnate`= ?,`contact_phone`= ?, `apr`= ?, `province`= ?, `pays`= ? WHERE id = ?"
     const values = [
         req.body.company_name,
         req.body.address,
@@ -404,7 +428,10 @@ export const updateClient = (req, res)=> {
         req.body.contact_email,
         req.body.rccm,
         req.body.idnate,
-        req.body.contact_phone
+        req.body.contact_phone,
+        req.body.apr,
+        req.body.province,
+        req.body.pays
     ];
     db.query(q, [...values,employeId], (err, data) => {
         if (err) return res.send(err);
@@ -537,6 +564,16 @@ export const getMission = (req,res) =>{
     })
 }
 
+export const getSite = (req,res) =>{
+  const q = "SELECT * FROM sites";
+   
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
 export const getMissionView = (req,res) =>{
     const {id} = req.params;
     const q = "SELECT * FROM mission where id = ?";
@@ -556,6 +593,42 @@ export const getMissionWeek = (req,res) =>{
 
       return res.status(200).json(data);
   })
+}
+export const getMissionContrat = (req,res) =>{
+  const {id} = req.params;
+  const q = "SELECT * FROM contrats where client_id = ?";
+   
+  db.query(q ,id, (error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
+export const getContratAff = (req, res)=>{
+  const contratId = req.params.contratId;
+
+  const q = `
+  SELECT id, first_name, last_name, phone_number
+  FROM employees WHERE employees.contrat_id = ?`;
+
+  db.query(q, [contratId], (error, results) => {
+    if (error) {
+      console.error('Erreur lors de l\'exécution de la requête SQL :', error);
+      res.status(500).json({ error: 'Erreur lors de la récupération des agents affectés' });
+      return;
+    }
+
+    const agentsAffectes = results.map(agent => ({
+      id : agent.id,
+      first_name: agent.first_name,
+      last_name: agent.last_name,
+      phone_number: agent.phone_number
+    }));
+
+    res.json(agentsAffectes);
+  });
+
 }
 
 export const postMission = (req, res) => {
