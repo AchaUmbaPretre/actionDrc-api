@@ -214,12 +214,37 @@ export const getContrat = (req, res) =>{
     })
 }
 
+/* export const getAllContrat = (req, res) => {
+  const q = "SELECT contrats.*, emp1.company_name FROM contrats INNER JOIN clients AS emp1 ON contrats.client_id = emp1.id";
+  db.query(q, (error, data) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    
+    return res.status(200).json(data);
+  });
+} */
+
 export const getAllContrat = (req, res) => {
   const q = "SELECT contrats.*, emp1.company_name FROM contrats INNER JOIN clients AS emp1 ON contrats.client_id = emp1.id";
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
     }
+    
+    const currentDate = new Date();
+    data.forEach((contrat) => {
+      const startDate = new Date(contrat.start_date);
+      const endDate = new Date(contrat.end_date);
+
+      if (endDate < currentDate) {
+        contrat.status = 'Résilié';
+      } else if (startDate > currentDate) {
+        contrat.status = 'En attente';
+      } else {
+        contrat.status = 'En cours';
+      }
+    });
     
     return res.status(200).json(data);
   });
@@ -283,6 +308,8 @@ export const postContrat = (req, res) => {
   const endDate = new Date(end_date);
 
   let status = '';
+  const date = new Date();
+  console.log(date)
 
   if (startDate > endDate) {
     status = 'Résilié';
