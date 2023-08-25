@@ -308,8 +308,6 @@ export const postContrat = (req, res) => {
   const endDate = new Date(end_date);
 
   let status = '';
-  const date = new Date();
-  console.log(date)
 
   if (startDate > endDate) {
     status = 'Résilié';
@@ -628,8 +626,22 @@ export const getMissionContrat = (req,res) =>{
   db.query(q ,id, (error, data)=>{
       if(error) res.status(500).send(error)
 
+      const currentDate = new Date();
+      data.forEach((contrat) => {
+        const startDate = new Date(contrat.start_date);
+        const endDate = new Date(contrat.end_date);
+  
+        if (endDate < currentDate) {
+          contrat.status = 'Résilié';
+        } else if (startDate > currentDate) {
+          contrat.status = 'En attente';
+        } else {
+          contrat.status = 'En cours';
+        }
+      });
+      
       return res.status(200).json(data);
-  })
+    });
 }
 
 export const getContratAff = (req, res)=>{
