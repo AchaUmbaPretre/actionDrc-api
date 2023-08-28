@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import moment from 'moment';
 
+
+
 dotenv.config();
 
 
@@ -672,7 +674,7 @@ export const getContratAff = (req, res)=>{
 
 export const postMission = (req, res) => {
   const q =
-    'INSERT INTO mission (`agent_id`, `client_id`, `dateEntrant`, `dateSortant`, `duree`,`site`) VALUES (?, ?, ?, ?, ?, ?)';
+    'INSERT INTO mission (`agent_id`, `client_id`, `heureEntrant`, `heureSortant`, `jour`,`site`) VALUES (?, ?, ?, ?, ?, ?)';
 
 /*   const dateEntrant = moment(req.body.dateEntrant, 'YYYY-MM-DD');
   const dateSortant = moment(req.body.dateSortant, 'YYYY-MM-DD'); */
@@ -681,13 +683,12 @@ export const postMission = (req, res) => {
 
   const values = [
     req.body.agent_id,
-    req.body.clientId,
-    req.body.dateEntrant,
-    req.body.dateSortant,
-    req.body.duree,
+    req.body.client_id,
+    req.body.heureEntrant,
+    req.body.heureSortant,
+    req.body.jour,
     req.body.site
   ];
-  console.log(values)
   db.query(q, values, (error, data) => {
     if (error) {
       res.status(500).json(error);
@@ -702,8 +703,8 @@ export const updateMission = (req, res) =>{
   const { id } = req.params;
   const {agent_id, client_id, dateEntrant, dateSortant, duree, montant } = req.body;
 
-  const query = `UPDATE mission SET agent_id = ?, client_id = ?, dateEntrant = ?, dateSortant = ?, duree = ?, montant = ? WHERE id = ?`;
-  const values = [agent_id , client_id, dateEntrant, dateSortant, duree, montant, id];
+  const query = `UPDATE mission SET agent_id = ?, client_id = ?, dateEntrant = ?, dateSortant = ?, jour = ?, montant = ? WHERE id = ?`;
+  const values = [agent_id , client_id, dateEntrant, dateSortant, jour, montant, id];
 
   db.query(query, values, (error, result) => {
     if (error) {
@@ -750,7 +751,7 @@ export const getSalaireMission = (req, res)=>{
 }
 
 export const getAllMission = (req, res) => {
-    const q = "SELECT dateEntrant, dateSortant, duree, mission.id, emp1.first_name, emp2.company_name FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id";
+    const q = "SELECT heureEntrant, heureSortant, emp3.days, mission.id, emp1.first_name, emp2.company_name FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id INNER JOIN weekdays AS emp3 ON mission.jour = emp3.id";
     db.query(q, (error, data) => {
       if (error) {
         return res.status(500).send(error);
@@ -762,7 +763,7 @@ export const getAllMission = (req, res) => {
 
   export const getAllMissionView = (req, res) => {
     const {id} = req.params;
-    const q = "SELECT dateEntrant, dateSortant, duree, montant, mission.id, emp1.first_name, emp2.company_name FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id WHERE mission.id = ?";
+    const q = "SELECT heureEntrant, heureSortant, jour, montant, mission.id, emp1.first_name, emp2.company_name FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id WHERE mission.id = ?";
     db.query(q, id, (error, data) => {
       if (error) {
         return res.status(500).send(error);
