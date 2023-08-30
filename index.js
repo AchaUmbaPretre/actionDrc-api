@@ -13,11 +13,15 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
+app.use('/', (req, res)=>{
+  res.send('Erreur')
+})
 app.use('/api/auth', authRoute)
 app.use('/api/admin', adminRoute)
 app.use('/api/users', usersRoute)
 
-const storage = multer.diskStorage({
+
+  const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, '../admin-drc/public/upload');
     },

@@ -763,7 +763,7 @@ export const getAllMission = (req, res) => {
 
   export const getAllMissionView = (req, res) => {
     const {id} = req.params;
-    const q = "SELECT heureEntrant, heureSortant, jour, montant, mission.id, emp1.first_name, emp2.company_name FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id WHERE mission.id = ?";
+    const q = "SELECT heureEntrant, heureSortant, jour, mission.id, emp1.first_name, emp2.company_name FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id WHERE mission.id = ?";
     db.query(q, id, (error, data) => {
       if (error) {
         return res.status(500).send(error);
