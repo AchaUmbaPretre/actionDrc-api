@@ -1,24 +1,21 @@
-import { db } from "../db.js";
-import jwt from 'jsonwebtoken'
-import dotenv from 'dotenv'
-import moment from 'moment';
-
-
+const { db } = require("../db.js");
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+const moment = require('moment');
 
 dotenv.config();
 
-
-export const getEmploye = (req, res) => {
-    const q = "SELECT * FROM employees";
+exports.getEmploye = (req, res) => {
+    const q = "SELECT * FROM employees WHERE est_supprime = 0";
      
-    db.query(q ,(error, data)=>{
-        if(error) res.status(500).send(error)
+    db.query(q, (error, data) => {
+        if (error) res.status(500).send(error);
 
         return res.status(200).json(data);
-    })
-  }
+    });
+};
 
-export const getEmployeCount = (req, res) => {
+exports.getEmployeCount = (req, res) => {
   const q = "SELECT count(*) as total FROM employees";
 
   db.query(q ,(error, data)=>{
@@ -51,7 +48,7 @@ export const getEmployeCount = (req, res) => {
     return res.status(200).json(data);
   });
 } */
-export const getEmployeJoin = (req, res) => {
+exports.getEmployeJoin = (req, res) => {
   const q = "SELECT employees.*, affectations.emploie_id AS nom_emploi FROM employees JOIN affectations ON employees.id = affectations.employee_id";
   
   db.query(q, (err, results) => {
@@ -80,7 +77,7 @@ WHERE Emploi.id = <id_emploi></id_emploi> */
     })
 } */
 
-export const viewsEmploye = (req, res) => {
+exports.viewsEmploye = (req, res) => {
   const { id } = req.params;
   const q = `
     SELECT employees.*, clients.company_name AS nom_client
@@ -99,7 +96,7 @@ export const viewsEmploye = (req, res) => {
   });
 };
 
-export const postEmploye = (req, res) => {
+exports.postEmploye = (req, res) => {
     const q = 'INSERT INTO employees(`first_name`,`last_name`,`date_of_birth`,`gender`,`address`,`phone_number`,`email`,`identification_number`,`etat_civil`,`number_inpp`,`number_cnss`,`nombre_enfant`,`identification_type`,`skills`, `certifications`, `employment_status`,`contrat_id`, `source`) VALUES(?)';
     const values = [
         req.body.first_name,
@@ -124,22 +121,22 @@ export const postEmploye = (req, res) => {
 
     db.query(q, [values], (error,data)=>{
         if(error) res.status(500).json(error)
-        console.log(error)
+
         return res.json('processus reussi');
     })
 }
 
-export const deleteEmploye = (req, res)=>{
-    const employeId = req.params.id;
-    const q = "DELETE FROM employees WHERE id = ?"
+exports.deleteEmploye = (req, res) => {
+  const employeeId = req.params.id;
+  const q = "UPDATE employees SET est_supprime = 1 WHERE id = ?";
 
-    db.query(q, [employeId], (err, data)=>{
-        if (err) return res.send(err);
-      return res.json(data);
-    })
-}
+  db.query(q, [employeeId], (err, data) => {
+    if (err) return res.send(err);
+    return res.json(data);
+  });
+};
 
-export const updateEmploye = (req, res)=> {
+exports.updateEmploye = (req, res)=> {
     const employeId = req.params.id;
     const q = "UPDATE employees SET `first_name`= ?, `last_name`= ?, `date_of_birth`= ?, `gender`= ?, `address`= ?,`phone_number`= ?, `email`= ?, `identification_number`= ?, `etat_civil`= ?, `number_inpp`= ?, `number_cnss`= ?, `nombre_enfant`= ?, `identification_type`= ?,`skills`= ?, `certifications`= ?, `employment_status`= ? WHERE id = ?"
     const values = [
@@ -166,7 +163,7 @@ export const updateEmploye = (req, res)=> {
       });
 }
 
-export const getCompetence = (req, res) =>{
+exports.getCompetence = (req, res) =>{
   const q = "SELECT * FROM competences";
      
   db.query(q ,(error, data)=>{
@@ -176,7 +173,7 @@ export const getCompetence = (req, res) =>{
   })
 }
 
-export const getNiveau = (req, res) =>{
+exports.getNiveau = (req, res) =>{
   const q = "SELECT * FROM niveauetude";
      
   db.query(q ,(error, data)=>{
@@ -186,7 +183,7 @@ export const getNiveau = (req, res) =>{
   })
 }
 
-export const getType = (req, res) =>{
+exports.getType = (req, res) =>{
   const q = "SELECT * FROM type_piece";
      
   db.query(q ,(error, data)=>{
@@ -196,7 +193,7 @@ export const getType = (req, res) =>{
   })
 }
 
-export const getStatus = (req, res) =>{
+exports.getStatus = (req, res) =>{
   const q = "SELECT * FROM status";
      
   db.query(q ,(error, data)=>{
@@ -206,7 +203,7 @@ export const getStatus = (req, res) =>{
   })
 }
 
-export const getContrat = (req, res) =>{
+exports.getContrat = (req, res) =>{
     const q = "SELECT * FROM contrats";
      
     db.query(q ,(error, data)=>{
@@ -227,7 +224,7 @@ export const getContrat = (req, res) =>{
   });
 } */
 
-export const getAllContrat = (req, res) => {
+exports.getAllContrat = (req, res) => {
   const q = "SELECT contrats.*, emp1.company_name FROM contrats INNER JOIN clients AS emp1 ON contrats.client_id = emp1.id";
   db.query(q, (error, data) => {
     if (error) {
@@ -252,7 +249,7 @@ export const getAllContrat = (req, res) => {
   });
 }
 
-export const getContratCount = (req, res) => {
+exports.getContratCount = (req, res) => {
   const q = "SELECT count(*) as total FROM contrats";
 
   db.query(q ,(error, data)=>{
@@ -262,17 +259,20 @@ export const getContratCount = (req, res) => {
 })
 }
 
-export const viewsContrat = (req, res) =>{
+exports.viewsContrat = (req, res) =>{
     const {id} = req.params;
-    const q = "SELECT * FROM contrats where id = ?";
 
-    db.query(q, id, (error, data)=>{
-        if(error) res.status(500).send(error)
+    const q = "SELECT contrats.*, emp1.company_name FROM contrats INNER JOIN clients AS emp1 ON contrats.client_id = emp1.id WHERE contrats.id = ?";
+
+    db.query(q, id, (error, data) => {
+        if (error) {
+            return res.status(500).send(error);
+        }
         return res.status(200).json(data);
-    })
+    });
        
 }
-export const getAvantage = (req, res) =>{
+exports.getAvantage = (req, res) =>{
     const q = "SELECT * FROM avantages";
      
     db.query(q ,(error, data)=>{
@@ -282,7 +282,7 @@ export const getAvantage = (req, res) =>{
     })
 }
 
-export const getContratType = (req, res) =>{
+exports.getContratType = (req, res) =>{
     const q = "SELECT * FROM typecontrat";
      
     db.query(q ,(error, data)=>{
@@ -292,7 +292,7 @@ export const getContratType = (req, res) =>{
     })
 }
 
-export const getStatusContrat = (req, res) =>{
+exports.getStatusContrat = (req, res) =>{
     const q = "SELECT * FROM statusContrat";
      
     db.query(q ,(error, data)=>{
@@ -302,7 +302,7 @@ export const getStatusContrat = (req, res) =>{
     })
 }
 
-export const postContrat = (req, res) => {
+exports.postContrat = (req, res) => {
   const q = 'INSERT INTO contrats(`contract_type`, `client_id`, `start_date`, `end_date`, `contract_status`) VALUES(?, ?, ?, ?, ?)';
 
   const { contract_type, client_id, start_date, end_date } = req.body;
@@ -330,7 +330,55 @@ export const postContrat = (req, res) => {
   });
 };
 
-export const deleteContrat = (req, res) =>{
+exports.getContratInfo = (req, res) =>{
+  const q = "SELECT * FROM fonction";
+   
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
+exports.getContratInfosAll = (req, res) =>{
+  const q = "SELECT fonction.*,clients.company_name AS nom_client, competences.nom FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN competences ON fonction.skills = competences.id";
+   
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
+exports.getContratInfosAllOne = (req, res) =>{
+  const {id} = req.params
+  const q = "SELECT fonction.*,clients.company_name AS nom_client, competences.nom  FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN competences ON fonction.skills = competences.id WHERE fonction.contrat_id = ?";
+   
+  db.query(q ,id,(error, data)=>{
+      if(error) res.status(500).send(error)
+      return res.status(200).json(data);
+  })
+}
+
+exports.postContratInfo = (req, res) => {
+  const q = 'INSERT INTO fonction(`contrat_id`, `client_id`, `skills`, `avantages`, `prix`, `salaire`) VALUES(?, ?, ?, ?, ?, ?)';
+
+  const { contrat_id, client_id, skills, avantages, prix, salaire} = req.body;
+
+
+  const values = [contrat_id, client_id, skills, avantages, prix, salaire];
+
+  db.query(q, values, (error, data) => {
+    if (error) {
+      res.status(500).json(error);
+      console.log(error)
+    } else {
+      res.json('Processus réussi');
+    }
+  });
+};
+
+exports.deleteContrat = (req, res) =>{
     const employeId = req.params.id;
     const q = "DELETE FROM contrats WHERE id = ?"
 
@@ -340,7 +388,7 @@ export const deleteContrat = (req, res) =>{
     })
 }
 
-export const updateContrat = (req, res) =>{
+exports.updateContrat = (req, res) =>{
     const contratId = req.params.id;
     const q = "UPDATE employees SET `first_name`= ?, `last_name`= ?, `date_of_birth`= ?, `gender`= ?, `address`= ?,`phone_number`= ?, `email`= ?, `identification_number`= ?, `identification_type`= ?,`skills`= ?, `certifications`= ?, `employment_status`= ? WHERE id = ?"
     const values = [
@@ -358,7 +406,7 @@ export const updateContrat = (req, res) =>{
       });
 }
 
-export const getClient = (req, res) =>{
+exports.getClient = (req, res) =>{
     const q = "SELECT * FROM clients";
      
     db.query(q ,(error, data)=>{
@@ -368,7 +416,7 @@ export const getClient = (req, res) =>{
     })
 }
 
-export const getProvince = (req, res) =>{
+exports.getProvince = (req, res) =>{
   const q = "SELECT * FROM province";
    
   db.query(q ,(error, data)=>{
@@ -378,7 +426,7 @@ export const getProvince = (req, res) =>{
   })
 }
 
-export const getPays = (req, res) =>{
+exports.getPays = (req, res) =>{
   const q = "SELECT * FROM pays";
    
   db.query(q ,(error, data)=>{
@@ -388,7 +436,7 @@ export const getPays = (req, res) =>{
   })
 }
 
-export const getClientCount = (req, res) => {
+exports.getClientCount = (req, res) => {
   const q = "SELECT count(*) as total FROM clients";
 
   db.query(q ,(error, data)=>{
@@ -398,7 +446,7 @@ export const getClientCount = (req, res) => {
 })
 }
 
-export const viewsClient = (req, res) =>{
+exports.viewsClient = (req, res) =>{
     const {id} = req.params;
     const q = "SELECT * FROM clients where id = ?";
 
@@ -409,7 +457,7 @@ export const viewsClient = (req, res) =>{
        
 }
 
-export const postClient= (req, res) =>{
+exports.postClient= (req, res) =>{
     const q = 'INSERT INTO clients(`company_name`,`address`,`phone_number`,`contact_name`,`contact_email`,`rccm`,`idnate`,`contact_phone`,`apr`,`province`,`pays`) VALUES(?)';
     const values = [
         req.body.company_name,
@@ -427,13 +475,13 @@ export const postClient= (req, res) =>{
 
     db.query(q, [values], (error,data)=>{
         if(error) res.status(500).json(error)
-        console.log(error)
+
         return res.json('processus reussi');
     })
 }
 
     
-export const deleteClient = (req, res) =>{
+exports.deleteClient = (req, res) =>{
 
     const clientId = req.params.id;
     const q = "DELETE FROM clients WHERE id = ?"
@@ -444,7 +492,7 @@ export const deleteClient = (req, res) =>{
     })
 }
 
-export const updateClient = (req, res)=> {
+exports.updateClient = (req, res)=> {
     const employeId = req.params.id;
     const q = "UPDATE clients SET `company_name`= ?, `address`= ?, `phone_number`= ?, `contact_name`= ?, `address`= ?,`phone_number`= ?, `contact_email`= ?, `rccm`= ?, `idnate`= ?,`contact_phone`= ?, `apr`= ?, `province`= ?, `pays`= ? WHERE id = ?"
     const values = [
@@ -468,7 +516,7 @@ export const updateClient = (req, res)=> {
 
 
 
-export const getFonction = (req, res) =>{
+exports.getFonction = (req, res) =>{
     const q = "SELECT * FROM fonctions";
      
     db.query(q ,(error, data)=>{
@@ -478,7 +526,7 @@ export const getFonction = (req, res) =>{
     })
 }
 
-export const getFonctionDetail = (req, res) =>{
+exports.getFonctionDetail = (req, res) =>{
   const {id} = req.params;
   const q = "SELECT * FROM fonctions WHERE id = ?";
    
@@ -489,7 +537,7 @@ export const getFonctionDetail = (req, res) =>{
   })
 }
 
-export const getEmploieDispo = (req, res) =>{
+exports.getEmploieDispo = (req, res) =>{
   const q = "SELECT employees.*, IF(contrats.end_date IS NULL OR contrats.end_date < CURDATE(), 'disponible', 'indisponible') AS disponibilite FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id"
     db.query(q, (error, results)=>{
       if (error) {
@@ -511,7 +559,7 @@ export const getEmploieDispo = (req, res) =>{
 }
 
 
-export const updateEmployeFonction = (req, res)=> {
+exports.updateEmployeFonction = (req, res)=> {
   const employeId = req.params.id;
   const q = "UPDATE employees SET contrat_id = ? WHERE id = ?"
   const values = [
@@ -522,11 +570,14 @@ export const updateEmployeFonction = (req, res)=> {
       return res.json(data);
     });
 }
+/* exports.updateFonctionOne =(req,res)=>{
+  const {id} = req.params;
+  const q = 
+} */
 
 
 
-
-export const postAffectation = (req, res) =>{
+exports.postAffectation = (req, res) =>{
     const q = 'INSERT INTO affectations(`fonction_id`,`emploie_id`,`contrat_id`) VALUES(?)';
     const values = [
         req.body.fonction_id,
@@ -540,7 +591,20 @@ export const postAffectation = (req, res) =>{
     })
 }
 
-export const getAffectation = (req,res) =>{
+exports.postFonctionClient = (req, res) =>{
+  const q = 'INSERT INTO fonction_client(`fonction_id`,`client_id`) VALUES(?)';
+  const values = [
+      req.body.fonction_id,
+      req.body.client_id,
+  ]
+
+  db.query(q, [values], (error,data)=>{
+      if(error) res.status(500).json(error)
+      return res.json('processus reussi');
+  })
+}
+
+exports.getAffectation = (req,res) =>{
     const q = "SELECT * FROM affectations";
      
     db.query(q ,(error, data)=>{
@@ -549,7 +613,7 @@ export const getAffectation = (req,res) =>{
         return res.status(200).json(data);
     })
 }
-export const getAffectationCount = (req, res) => {
+exports.getAffectationCount = (req, res) => {
   const q = "SELECT count(*) as total FROM affectations";
 
   db.query(q ,(error, data)=>{
@@ -559,8 +623,8 @@ export const getAffectationCount = (req, res) => {
 })
 }
 
-export const getAllAffectation = (req, res) => {
-  const q = "SELECT affectations.id, emp1.first_name, emp1.last_name, emp1.skills, fonctions.nom, fonctions.salaire, contrats.end_date, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonctions ON affectations.fonction_id = fonctions.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id";
+exports.getAllAffectation = (req, res) => {
+  const q = "SELECT affectations.id, emp1.first_name, emp1.last_name, emp1.skills, fonction.contrat_id, fonction.avantages, fonction.salaire, fonction.prix, contrats.end_date, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction ON affectations.fonction_id = fonction.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id";
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
@@ -570,7 +634,19 @@ export const getAllAffectation = (req, res) => {
   });
 }
 
-  export const deleteAffectation = (req, res) =>{
+exports.getAllAffectationOne = (req, res) => {
+  const {id} = req.params;
+  const q = "SELECT affectations.id, emp1.first_name, emp1.last_name, emp1.skills, fonctions.nom, fonctions.salaire, contrats.end_date, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonctions ON affectations.fonction_id = fonctions.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id WHERE affectations.id = ?";
+  db.query(q, id,(error, data) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    
+    return res.status(200).json(data);
+  });
+}
+
+exports.deleteAffectation = (req, res) =>{
 
     const clientId = req.params.id;
     const q = "DELETE FROM affectations WHERE id = ?"
@@ -581,7 +657,7 @@ export const getAllAffectation = (req, res) => {
     })
 }
 
-export const getMission = (req,res) =>{
+exports.getMission = (req,res) =>{
     const q = "SELECT * FROM mission";
      
     db.query(q ,(error, data)=>{
@@ -591,7 +667,7 @@ export const getMission = (req,res) =>{
     })
 }
 
-export const getSite = (req,res) =>{
+exports.getSite = (req,res) =>{
   const q = "SELECT * FROM sites";
    
   db.query(q ,(error, data)=>{
@@ -601,7 +677,7 @@ export const getSite = (req,res) =>{
   })
 }
 
-export const getMissionView = (req,res) =>{
+exports.getMissionView = (req,res) =>{
     const {id} = req.params;
     const q = "SELECT * FROM mission where id = ?";
      
@@ -612,7 +688,7 @@ export const getMissionView = (req,res) =>{
     })
 }
 
-export const getMissionWeek = (req,res) =>{
+exports.getMissionWeek = (req,res) =>{
   const q = "SELECT * FROM weekdays";
    
   db.query(q ,(error, data)=>{
@@ -621,7 +697,7 @@ export const getMissionWeek = (req,res) =>{
       return res.status(200).json(data);
   })
 }
-export const getMissionContrat = (req,res) =>{
+exports.getMissionContrat = (req,res) =>{
   const {id} = req.params;
   const q = "SELECT * FROM contrats where client_id = ?";
    
@@ -646,7 +722,7 @@ export const getMissionContrat = (req,res) =>{
     });
 }
 
-export const getContratAff = (req, res)=>{
+exports.getContratAff = (req, res)=>{
   const contratId = req.params.contratId;
 
   const q = `
@@ -672,7 +748,7 @@ export const getContratAff = (req, res)=>{
 
 }
 
-export const postMission = (req, res) => {
+exports.postMission = (req, res) => {
   const q =
     'INSERT INTO mission (`agent_id`, `client_id`, `heureEntrant`, `heureSortant`, `jour`,`site`) VALUES (?, ?, ?, ?, ?, ?)';
 
@@ -699,7 +775,7 @@ export const postMission = (req, res) => {
   });
 };
 
-export const updateMission = (req, res) =>{
+exports.updateMission = (req, res) =>{
   const { id } = req.params;
   const {agent_id, client_id, dateEntrant, dateSortant, duree, montant } = req.body;
 
@@ -717,7 +793,7 @@ export const updateMission = (req, res) =>{
 }
 
 
-export const deleteMission = (req, res) =>{
+exports.deleteMission = (req, res) =>{
 
     const clientId = req.params.id;
     const q = "DELETE FROM mission WHERE id = ?"
@@ -728,7 +804,7 @@ export const deleteMission = (req, res) =>{
     })
 }
 
-export const getDuration = (req, res)=>{
+exports.getDuration = (req, res)=>{
 
     const q = "SELECT start_date, end_date FROM contrats";
      
@@ -739,7 +815,7 @@ export const getDuration = (req, res)=>{
     })
 }
 
-export const getSalaireMission = (req, res)=>{
+exports.getSalaireMission = (req, res)=>{
 
     const q = "SELECT id, salaire FROM fonctions";
      
@@ -750,7 +826,7 @@ export const getSalaireMission = (req, res)=>{
     })
 }
 
-export const getAllMission = (req, res) => {
+exports.getAllMission = (req, res) => {
     const q = "SELECT heureEntrant, heureSortant, emp3.days, mission.id, emp1.first_name, emp2.company_name FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id INNER JOIN weekdays AS emp3 ON mission.jour = emp3.id";
     db.query(q, (error, data) => {
       if (error) {
@@ -761,7 +837,7 @@ export const getAllMission = (req, res) => {
     });
   }
 
-  export const getAllMissionView = (req, res) => {
+exports.getAllMissionView = (req, res) => {
     const {id} = req.params;
     const q = "SELECT heureEntrant, heureSortant, jour, mission.id, emp1.first_name, emp2.company_name FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id WHERE mission.id = ?";
     db.query(q, id, (error, data) => {
@@ -772,7 +848,7 @@ export const getAllMission = (req, res) => {
     });
   }
 
-  export const getHoraire = (req, res) => {
+exports.getHoraire = (req, res) => {
     const q = "SELECT * FROM work_schedule";
      
     db.query(q ,(error, data)=>{
@@ -781,12 +857,11 @@ export const getAllMission = (req, res) => {
         return res.status(200).json(data);
     })
   }
-export const postHoraire = (req, res) => {
+exports.postHoraire = (req, res) => {
     const { employee_id, client_id, start_date, end_date, weekday, start_time, end_time } = req.body;
 
     const formattedStartTime = start_time.substring(0, 5);
     const formattedEndTime = end_time.substring(0, 5);
-    console.log(formattedStartTime)
   
     const query = `INSERT INTO work_schedule (employee_id , client_id, start_date, end_date, weekday, start_time, end_time) VALUES (?, ?, ?, ?, ?, ?, ?)`;
     const values = [employee_id, client_id, start_date, end_date, weekday ,formattedStartTime, formattedEndTime];
@@ -801,7 +876,7 @@ export const postHoraire = (req, res) => {
     });
 }
 
-export const getAllHoraire = (req, res) => {
+exports.getAllHoraire = (req, res) => {
   const q = "SELECT work_schedule.id, start_date, end_date, emp3.days, start_time, end_time, emp1.first_name, emp2.company_name FROM work_schedule INNER JOIN employees AS emp1 ON work_schedule.employee_id  = emp1.id INNER JOIN clients AS emp2 ON work_schedule.client_id = emp2.id INNER JOIN weekdays AS emp3 ON work_schedule.weekday = emp3.id";
   db.query(q, (error, data) => {
     if (error) {
@@ -812,7 +887,7 @@ export const getAllHoraire = (req, res) => {
   });
 }
 
-export const getAllHoraireView = (req, res) => {
+exports.getAllHoraireView = (req, res) => {
   const {id} = req.params;
   const q = "SELECT work_schedule.id, start_date, end_date, emp3.days, start_time, end_time, emp1.first_name, emp2.company_name FROM work_schedule INNER JOIN employees AS emp1 ON work_schedule.employee_id  = emp1.id INNER JOIN clients AS emp2 ON work_schedule.client_id = emp2.id INNER JOIN weekdays AS emp3 ON work_schedule.weekday = emp3.id where work_schedule.id = ?";
   db.query(q,id, (error, data) => {
@@ -838,7 +913,7 @@ export const getAllHoraireView = (req, res) => {
     });
   }; */
 
-  export const deleteHoraire = (req, res) =>{
+exports.deleteHoraire = (req, res) =>{
 
     const clientId = req.params.id;
     const q = "DELETE FROM work_schedule WHERE id = ?"
@@ -849,7 +924,7 @@ export const getAllHoraireView = (req, res) => {
     })
 }
 
-export const putHoraires = (req, res) => {
+exports.putHoraires = (req, res) => {
     const { id } = req.params;
     const { startDate, endDate, weekday, startTime, endTime } = req.body;
   
@@ -866,7 +941,7 @@ export const putHoraires = (req, res) => {
     }) }
 
 
-export const getPresence = (req,res) => {
+exports.getPresence = (req,res) => {
   const q = "SELECT * FROM attendance";
    
   db.query(q ,(error, data)=>{
@@ -876,7 +951,7 @@ export const getPresence = (req,res) => {
   })
 }
 
-export const getAllPresence = (req, res) => {
+exports.getAllPresence = (req, res) => {
   const q = "SELECT attendance.id, date, check_in_time, check_out_time, emp1.id AS emp1_id, emp1.first_name, emp2.company_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id";
   db.query(q, (error, data) => {
     if (error) {
@@ -887,7 +962,7 @@ export const getAllPresence = (req, res) => {
   });
 }
 
-export const getAllPresenceView = (req, res) => {
+exports.getAllPresenceView = (req, res) => {
   const {id} = req.params;
   const q = "SELECT attendance.id , date, check_in_time, check_out_time, emp1.first_name, emp2.company_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id  = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id where attendance.id = ?";
   db.query(q,id, (error, data) => {
@@ -899,42 +974,22 @@ export const getAllPresenceView = (req, res) => {
   });
 }
 
-export const postPresence = (req, res)=>{
+exports.postPresence = (req, res)=>{
+
   const { employee_id, client_id, date, check_in_time, check_out_time } = req.body;
-  console.log(employee_id, check_out_time.day)
+  const q = 'INSERT INTO attendance (employee_id, client_id, date, check_in_time, check_out_time) VALUES (?, ?, ?, ?, ?)';
 
-  const checkScheduleQuery = `SELECT * FROM work_schedule WHERE employee_id  = ? AND weekday = ?`;
-
-  db.query(checkScheduleQuery, [employee_id, check_in_time.day], (error, results)=>{
-    if (error) {
-      console.error("Erreur lors de la vérification de l'horaire de travail: ", error);
-      res.status(500).json({ error: "Erreur lors de la vérification de l'horaire de travail" });
-    } else if(results.length === 0){
-      res.status(400).json({ error: "Aucun horaire de travail trouvé pour l'employé et le jour" });
-    }else {
-      const schedule = results[0];
-      const startTime = new Date(check_in_time.time);
-      const endTime = new Date(check_out_time.time);
-      const workStartTime = new Date(schedule.start_time);
-      const workEndTime = new Date(schedule.end_time);
-
-      if (startTime < workStartTime || endTime > workEndTime) {
-        res.status(400).json({ error: "L'heure d'arrivée/de départ est en dehors de l'horaire de travail" });
-      } else {
-        const insertAttendanceQuery = 'INSERT INTO attendance (employee_id, client_id, date, check_in_time, check_out_time) VALUES (?, ?, ?, ?, ?)';
-        db.query(insertAttendanceQuery,
-          [employee_id, client_id, date, check_in_time.time, check_out_time.time],  (error, results) =>{
-            if(error){
-              console.error("Erreur lors de l'insertion de la présence : ", error);
-              res.status(500).json({ error: 'Error inserting attendance' });
-            } else  res.json({ message: "Présence enregistrée avec succès" });
-          })
-      }
-    }
+  
+  db.query(q, [employee_id, client_id, date, check_in_time.time, check_out_time.time],  (error, results) =>{
+    if(error){
+      console.error("Erreur lors de l'insertion de la présence : ", error);
+      res.status(500).json({ error: 'Error inserting attendance' });
+    } else  res.json({ message: "Présence enregistrée avec succès" });
   })
+
 }
 
-export const countPresence = (req, res) => {
+exports.countPresence = (req, res) => {
 
   const employeeId = req.params.id;
   const q = 'SELECT COUNT(*) AS attendanceCount FROM attendance WHERE employee_id = ?';
@@ -951,7 +1006,7 @@ export const countPresence = (req, res) => {
 
 }
 
-export const deletePresence = (req, res) =>{
+exports.deletePresence = (req, res) =>{
 
   const clientId = req.params.id;
   const q = "DELETE FROM attendance WHERE id = ?"
@@ -962,7 +1017,7 @@ export const deletePresence = (req, res) =>{
   })
 }
 
-export const updatePresence = (req, res) =>{
+exports.updatePresence = (req, res) =>{
   const { id } = req.params;
   const {employee_id, client_id, date, check_in_time, check_out_time } = req.body;
 
@@ -980,7 +1035,7 @@ export const updatePresence = (req, res) =>{
 }
 
 
-export const getFacture = (req, res) => {
+exports.getFacture = (req, res) => {
   const q = "SELECT * FROM invoices";
    
   db.query(q ,(error, data)=>{
@@ -990,7 +1045,7 @@ export const getFacture = (req, res) => {
   })
 }
 
-export const getMontantStatus = (req, res) => {
+exports.getMontantStatus = (req, res) => {
   const q = "SELECT * FROM statusmontant";
    
   db.query(q ,(error, data)=>{
@@ -1000,7 +1055,7 @@ export const getMontantStatus = (req, res) => {
   })
 }
 
-export const getAllFacture = (req, res) => {
+exports.getAllFacture = (req, res) => {
   const q = "SELECT invoices.id, invoice_date, due_date, total_amount,status , emp2.company_name FROM invoices INNER JOIN clients AS emp2 ON invoices.client_id = emp2.id";
   db.query(q, (error, data) => {
     if (error) {
@@ -1011,7 +1066,7 @@ export const getAllFacture = (req, res) => {
   });
 }
 
-export const getAllFactureView = (req, res) => {
+exports.getAllFactureView = (req, res) => {
   const {id} = req.params;
   const q = "SELECT invoices.id, invoice_date, due_date, total_amount,status , emp2.company_name FROM invoices INNER JOIN clients AS emp2 ON invoices.client_id = emp2.id where invoices.id = ?";
   db.query(q,id, (error, data) => {
@@ -1023,7 +1078,7 @@ export const getAllFactureView = (req, res) => {
   });
 }
 
-export const postFacture = async (req, res) => {
+exports.postFacture = async (req, res) => {
   const { client_id, invoice_date, due_date, total_amount, status } = req.body;
 
   try {
@@ -1044,7 +1099,7 @@ export const postFacture = async (req, res) => {
   }
 };
 
-export const deleteFacture = (req, res) =>{
+exports.deleteFacture = (req, res) =>{
 
   const clientId = req.params.id;
   const q = "DELETE FROM invoices WHERE id = ?"
@@ -1055,7 +1110,7 @@ export const deleteFacture = (req, res) =>{
   })
 }
 
-export const updateFacture = (req, res) =>{
+exports.updateFacture = (req, res) =>{
   const { id } = req.params;
   const {	client_id, 	invoice_date, due_date, total_amount, status } = req.body;
 
@@ -1072,7 +1127,7 @@ export const updateFacture = (req, res) =>{
   }) 
 }
 
-export const getPayement = (req, res) =>{
+exports.getPayement = (req, res) =>{
   const q = "SELECT * FROM payments";
    
   db.query(q ,(error, data)=>{
@@ -1081,7 +1136,7 @@ export const getPayement = (req, res) =>{
       return res.status(200).json(data);
   })
 }
-export const getPayementView = (req,res) =>{
+exports.getPayementView = (req,res) =>{
   const {id} = req.params;
   const q = "SELECT * FROM payments where id = ?";
    
@@ -1092,7 +1147,7 @@ export const getPayementView = (req,res) =>{
   })
 }
 
-export const getPayementAll = (req,res) =>{
+exports.getPayementAll = (req,res) =>{
   const q =  'SELECT payments.*, invoices.status FROM payments INNER JOIN invoices ON payments.invoice_id = invoices.id';
       db.query(q,(error, data)=>{
         if(error) res.status(500).send(error)
@@ -1101,7 +1156,7 @@ export const getPayementAll = (req,res) =>{
       })
 }
 
-export const postPayement = (req, res) => {
+exports.postPayement = (req, res) => {
   const { invoice_id, payment_date, amount, payment_method } = req.body;
 
   const q = 'INSERT INTO payments (invoice_id, payment_date, amount, payment_method) VALUES (?, ?, ?, ?)';
@@ -1113,14 +1168,12 @@ export const postPayement = (req, res) => {
       res.status(500).json({ error: 'Erreur lors de la création du paiement' });
     } else {
       const paymentId = result.insertId;
-
-      console.log('Paiement créé avec succès');
       res.status(200).json({ message: 'Paiement créé avec succès', payment_id: paymentId });
     }
   });
 };
 
-export const deletePayement = (req, res) =>{
+exports.deletePayement = (req, res) =>{
 
   const clientId = req.params.id;
   const q = "DELETE FROM payments WHERE id = ?"

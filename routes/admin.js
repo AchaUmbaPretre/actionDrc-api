@@ -1,5 +1,85 @@
-import express from "express";
-import { countPresence, deleteAffectation, deleteClient, deleteContrat, deleteEmploye, deleteFacture, deleteHoraire, deleteMission, deletePayement, deletePresence, getAffectation, getAffectationCount, getAllAffectation, getAllContrat, getAllFacture, getAllFactureView, getAllHoraire, getAllHoraireView, getAllMission, getAllMissionView, getAllPresence, getAllPresenceView, getAvantage, getClient, getClientCount, getCompetence, getContrat, getContratAff, getContratCount, getContratType, getDuration, getEmploieDispo, getEmploye, getEmployeCount, getFacture, getFonction, getFonctionDetail, getHoraire, getMission, getMissionContrat, getMissionView, getMissionWeek, getMontantStatus, getNiveau, getPayement, getPayementAll, getPays, getPresence, getProvince, getSalaireMission, getSite, getStatus, getStatusContrat, getType, postAffectation, postClient, postContrat, postEmploye, postFacture, postHoraire, postMission, postPayement, postPresence, putHoraires, updateContrat, updateEmploye, updateEmployeFonction, updateFacture, updateMission, updatePresence, viewsClient, viewsContrat, viewsEmploye } from "../controllers/adminControllers.js";
+const express = require('express')
+const {
+    countPresence,
+    deleteAffectation,
+    deleteClient,
+    deleteContrat,
+    deleteEmploye,
+    deleteFacture,
+    deleteHoraire,
+    deleteMission,
+    deletePayement,
+    deletePresence,
+    getAffectation,
+    getAffectationCount,
+    getAllAffectation,
+    getAllContrat,
+    getAllFacture,
+    getAllFactureView,
+    getAllHoraire,
+    getAllHoraireView,
+    getAllMission,
+    getAllMissionView,
+    getAllPresence,
+    getAllPresenceView,
+    getAvantage,
+    getClient,
+    getClientCount,
+    getCompetence,
+    getContrat,
+    getContratAff,
+    getContratCount,
+    getContratType,
+    getDuration,
+    getEmploieDispo,
+    getEmploye,
+    getEmployeCount,
+    getFacture,
+    getFonction,
+    getFonctionDetail,
+    getHoraire,
+    getMission,
+    getMissionContrat,
+    getMissionView,
+    getMissionWeek,
+    getMontantStatus,
+    getNiveau,
+    getPayement,
+    getPayementAll,
+    getPays,
+    getPresence,
+    getProvince,
+    getSalaireMission,
+    getSite,
+    getStatus,
+    getStatusContrat,
+    getType,
+    postAffectation,
+    postClient,
+    postContrat,
+    postEmploye,
+    postFacture,
+    postHoraire,
+    postMission,
+    postPayement,
+    postPresence,
+    putHoraires,
+    updateContrat,
+    updateEmploye,
+    updateEmployeFonction,
+    updateFacture,
+    updateMission,
+    updatePresence,
+    viewsClient,
+    viewsContrat,
+    viewsEmploye,
+    getAllAffectationOne,
+    postContratInfo,
+    getContratInfo,
+    getContratInfosAll,
+    getContratInfosAllOne,
+    postFonctionClient,
+  } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
 router.get('/', getEmploye)
@@ -7,7 +87,7 @@ router.get('/views/:id', viewsEmploye)
 router.get('/count', getEmployeCount)
 router.get('/')
 router.post('/employe', postEmploye)
-router.delete('/employe/:id', deleteEmploye)
+router.put('/employes/:id', deleteEmploye)
 router.put('/employe/:id', updateEmploye)
 
 router.get('/competence', getCompetence)
@@ -21,7 +101,11 @@ router.get('/contrat/views/:id', viewsContrat)
 router.get('/avantages', getAvantage)
 router.get('/contratType', getContratType)
 router.get('/statusContrat', getStatusContrat)
+router.get('/contratInfo', getContratInfosAll)
+router.get('/contratInfo/:id', getContratInfosAllOne)
+/* router.get('/contratInfo', getContratInfo) */
 router.post('/contrat', postContrat)
+router.post('/ContratInfo', postContratInfo)
 router.delete('/contrat/:id', deleteContrat)
 router.put('/contrat/:id', updateContrat)
 
@@ -39,12 +123,15 @@ router.put('/client/:id', updateContrat)
 router.get('/fonction', getFonction)
 router.get('/fonctionDetail/:id', getFonctionDetail)
 router.get('/emploieDispo', getEmploieDispo)
+router.post('/postFonctionClient', postFonctionClient)
+router.put('fonctionUpdate', )
 router.put('/employeFonctionPut/:id', updateEmployeFonction)
 
 
 router.get('/affectationCount', getAffectationCount)
 router.post('/affectations', postAffectation)
 router.get('/affectation', getAffectation)
+router.get('/affectations/:id', getAllAffectationOne)
 router.get('/allaffectation', getAllAffectation)
 router.delete('/deleteAff/:id', deleteAffectation)
 
@@ -91,4 +178,4 @@ router.get('/payementView', getAllFactureView);
 router.post('/payementPost', postPayement);
 router.delete('/payement/:id', deletePayement);
 
-export default router
+module.exports = router;
