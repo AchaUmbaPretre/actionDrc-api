@@ -360,6 +360,24 @@ exports.getContratInfosAllOne = (req, res) =>{
   })
 }
 
+exports.postContratEmploie = (req, res) => {
+  const q = 'INSERT INTO fonction_client(`contrat_id`, `emploie_id`, `skills`, `avantages`, `salaire`, `prix`) VALUES(?, ?, ?, ?, ?, ?)';
+
+  const { contrat_id, client_id, skills, avantages, salaire, prix} = req.body;
+
+
+  const values = [contrat_id, client_id, skills, avantages, salaire, prix];
+
+  db.query(q, values, (error, data) => {
+    if (error) {
+      res.status(500).json(error);
+      console.log(error)
+    } else {
+      res.json('Processus réussi');
+    }
+  });
+};
+
 exports.postContratInfo = (req, res) => {
   const q = 'INSERT INTO fonction(`contrat_id`, `client_id`, `skills`, `avantages`, `prix`, `salaire`) VALUES(?, ?, ?, ?, ?, ?)';
 
@@ -587,6 +605,7 @@ exports.postAffectation = (req, res) =>{
 
     db.query(q, [values], (error,data)=>{
         if(error) res.status(500).json(error)
+        console.log(error)
         return res.json('processus reussi');
     })
 }
