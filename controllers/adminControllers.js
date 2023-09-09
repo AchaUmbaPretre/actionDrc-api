@@ -434,6 +434,7 @@ exports.getClient = (req, res) =>{
     })
 }
 
+
 exports.getProvince = (req, res) =>{
   const q = "SELECT * FROM province";
    
@@ -694,6 +695,23 @@ exports.getSite = (req,res) =>{
 
       return res.status(200).json(data);
   })
+}
+
+exports.postSites = (req, res) => {
+  const q = 'INSERT INTO sites(`contrat_id`, `nom_site`) VALUES(?, ?)';
+
+  const { contrat_id, nom_site} = req.body;
+
+  const values = [contrat_id, nom_site];
+
+  db.query(q, values, (error, data) => {
+    if (error) {
+      res.status(500).json(error);
+      console.log(error)
+    } else {
+      res.json('Processus réussi');
+    }
+  });
 }
 
 exports.getMissionView = (req,res) =>{
