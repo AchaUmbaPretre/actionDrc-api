@@ -140,7 +140,7 @@ router.delete('/deleteAff/:id', deleteAffectation)
 
 router.get('/mission', getMission)
 router.get('/missionWeek', getMissionWeek)
-router.get('/sites', getSite)
+router.get('/sites/:id', getSite)
 router.post('/sites',postSites)
 router.get('/missionView/:id', getMissionView)
 router.get('/missionContrat/:id', getMissionContrat)

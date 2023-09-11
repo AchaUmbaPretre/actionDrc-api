@@ -362,18 +362,21 @@ exports.getContratInfosAllOne = (req, res) =>{
 
 exports.postContratEmploie = (req, res) => {
   const q = 'INSERT INTO fonction_client(`contrat_id`, `client_id`, `skills`, `avantages`, `salaire`, `prix`) VALUES(?, ?, ?, ?, ?, ?)';
-
-  const { contrat_id, client_id, skills, avantages, salaire, prix} = req.body;
-
+  const { contrat_id, client_id, skills, avantages, salaire, prix } = req.body;
 
   const values = [contrat_id, client_id, skills, avantages, salaire, prix];
 
   db.query(q, values, (error, data) => {
     if (error) {
       res.status(500).json(error);
-      console.log(error)
+      console.log(error);
     } else {
-      res.json('Processus réussi');
+      const contratEmploieId = data.insertId; // Obtenez l'ID du contrat nouvellement créé
+
+      res.json({
+        message: 'Processus réussi',
+        contratEmploieId: contratEmploieId, // Renvoyez l'ID du contrat dans la réponse
+      });
     }
   });
 };
@@ -602,9 +605,10 @@ exports.updateEmployeFonction = (req, res)=> {
 
 
 exports.postAffectation = (req, res) =>{
-    const q = 'INSERT INTO affectations(`fonction_id`,`emploie_id`,`contrat_id`) VALUES(?)';
+    const q = 'INSERT INTO affectations(`fonction_id`,`fonction_clientId`,`emploie_id`,`contrat_id`) VALUES(?)';
     const values = [
         req.body.fonction_id,
+        req.body.fonction_clientId,
         req.body.emploie_id,
         req.body.contrat_id,
     ]
@@ -693,9 +697,10 @@ exports.getMission = (req,res) =>{
 }
 
 exports.getSite = (req,res) =>{
-  const q = "SELECT * FROM sites";
+  const {id} = req.params
+  const q = "SELECT * FROM sites WHERE client_id = ?";
    
-  db.query(q ,(error, data)=>{
+  db.query(q ,id,(error, data)=>{
       if(error) res.status(500).send(error)
 
       return res.status(200).json(data);
@@ -869,15 +874,15 @@ exports.getSalaireMission = (req, res)=>{
 }
 
 exports.getAllMission = (req, res) => {
-    const q = "SELECT heureEntrant, heureSortant, emp3.days, mission.id, emp1.first_name, emp2.company_name FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id INNER JOIN weekdays AS emp3 ON mission.jour = emp3.id";
-    db.query(q, (error, data) => {
-      if (error) {
-        return res.status(500).send(error);
-      }
-      
-      return res.status(200).json(data);
-    });
-  }
+  const q = "SELECT heureEntrant, heureSortant, emp3.days, mission.id, emp1.first_name, emp2.company_name, sites.nom_site FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id INNER JOIN weekdays AS emp3 ON mission.jour = emp3.id INNER JOIN sites ON emp2.id = sites.client_id";
+  db.query(q, (error, data) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    
+    return res.status(200).json(data);
+  });
+}
 
 exports.getAllMissionView = (req, res) => {
     const {id} = req.params;
