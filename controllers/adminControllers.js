@@ -476,28 +476,33 @@ exports.viewsClient = (req, res) =>{
        
 }
 
-exports.postClient= (req, res) =>{
-    const q = 'INSERT INTO clients(`company_name`,`address`,`phone_number`,`contact_name`,`contact_email`,`rccm`,`idnate`,`contact_phone`,`apr`,`province`,`pays`) VALUES(?)';
-    const values = [
-        req.body.company_name,
-        req.body.address,
-        req.body.phone_number,
-        req.body.contact_name,
-        req.body.contact_email,
-        req.body.rccm,
-        req.body.idnate,
-        req.body.contact_phone,
-        req.body.apr,
-        req.body.province,
-        req.body.pays,
-    ]
+exports.postClient = (req, res) => {
+  const q =
+    'INSERT INTO clients(`company_name`,`address`,`phone_number`,`contact_name`,`contact_email`,`rccm`,`idnate`,`contact_phone`,`apr`,`province`,`pays`) VALUES(?)';
+  const values = [
+    req.body.company_name,
+    req.body.address,
+    req.body.phone_number,
+    req.body.contact_name,
+    req.body.contact_email,
+    req.body.rccm,
+    req.body.idnate,
+    req.body.contact_phone,
+    req.body.apr,
+    req.body.province,
+    req.body.pays,
+  ];
 
-    db.query(q, [values], (error,data)=>{
-        if(error) res.status(500).json(error)
+  db.query(q, [values], (error, result) => {
+    if (error) {
+      res.status(500).json(error);
+    } else {
+      const clientId = result.insertId;
 
-        return res.json('processus reussi');
-    })
-}
+      return res.json({ clientId: clientId, message: 'Processus réussi' });
+    }
+  });
+};
 
     
 exports.deleteClient = (req, res) =>{
@@ -698,11 +703,11 @@ exports.getSite = (req,res) =>{
 }
 
 exports.postSites = (req, res) => {
-  const q = 'INSERT INTO sites(`contrat_id`, `nom_site`) VALUES(?, ?)';
+  const q = 'INSERT INTO sites(`client_id`, `nom_site`) VALUES(?, ?)';
 
-  const { contrat_id, nom_site} = req.body;
+  const { client_id, nom_site} = req.body;
 
-  const values = [contrat_id, nom_site];
+  const values = [client_id, nom_site];
 
   db.query(q, values, (error, data) => {
     if (error) {
