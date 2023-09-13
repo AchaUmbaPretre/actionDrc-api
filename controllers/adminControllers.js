@@ -369,6 +369,16 @@ exports.getContratInfosAllOne = (req, res) =>{
   })
 }
 
+exports.getContratEmploie = (req, res) =>{
+  const q = "SELECT affectations.id AS id, emp1.avantages AS ava2, emp1.salaire AS salaire2, emp1.prix AS prix2,  emp2.first_name AS first2, emp2.last_name AS last2, emp2.skills AS skills2, emp3.end_date AS date2, emp4.company_name AS company2 FROM affectations INNER JOIN fonction_client AS emp1 ON affectations.fonction_clientId = emp1.id INNER JOIN employees AS emp2 ON affectations.emploie_id = emp2.id INNER JOIN contrats AS emp3 ON affectations.contrat_id = emp3.id INNER JOIN clients AS emp4 ON emp3.client_id = emp4.id";
+   
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
 exports.postContratEmploie = (req, res) => {
   const q = 'INSERT INTO fonction_client(`contrat_id`, `client_id`, `skills`, `avantages`, `salaire`, `prix`) VALUES(?, ?, ?, ?, ?, ?)';
   const { contrat_id, client_id, skills, avantages, salaire, prix } = req.body;
@@ -667,7 +677,6 @@ exports.getAllAffectation = (req, res) => {
     if (error) {
       return res.status(500).send(error);
     }
-    
     return res.status(200).json(data);
   });
 }
@@ -679,7 +688,6 @@ exports.getAllAffectationOne = (req, res) => {
     if (error) {
       return res.status(500).send(error);
     }
-    
     return res.status(200).json(data);
   });
 }
