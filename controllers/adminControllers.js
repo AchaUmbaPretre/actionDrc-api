@@ -303,7 +303,7 @@ exports.getStatusContrat = (req, res) =>{
 }
 
 exports.postContrat = (req, res) => {
-  const q = 'INSERT INTO contrats(`contract_type`, `client_id`, `start_date`, `end_date`, `contract_status`) VALUES(?, ?, ?, ?, ?)';
+  const q = 'INSERT INTO contrats(`contract_type`, `client_id`, `start_date`, `end_date`, `duree`, `contract_status`) VALUES(?, ?, ?, ?, ?,?)';
 
   const { contract_type, client_id, start_date, end_date } = req.body;
   const startDate = new Date(start_date);
@@ -319,13 +319,22 @@ exports.postContrat = (req, res) => {
     status = 'En cours';
   }
 
-  const values = [contract_type, client_id, start_date, end_date, status];
+  // Calcul de la durée en mois
+  const startYear = startDate.getFullYear();
+  const startMonth = startDate.getMonth();
+  const endYear = endDate.getFullYear();
+  const endMonth = endDate.getMonth();
+
+  const duree = (endYear - startYear) * 12 + (endMonth - startMonth);
+
+  const values = [contract_type, client_id, start_date, end_date, duree, status];
 
   db.query(q, values, (error, data) => {
     if (error) {
       res.status(500).json(error);
+      console.log(error)
     } else {
-      res.json('Processus réussi');
+      res.json(`Processus réussi. Durée du contrat : ${duree} mois.`);
     }
   });
 };
@@ -519,27 +528,27 @@ exports.deleteClient = (req, res) =>{
     })
 }
 
-exports.updateClient = (req, res)=> {
-    const employeId = req.params.id;
-    const q = "UPDATE clients SET `company_name`= ?, `address`= ?, `phone_number`= ?, `contact_name`= ?, `address`= ?,`phone_number`= ?, `contact_email`= ?, `rccm`= ?, `idnate`= ?,`contact_phone`= ?, `apr`= ?, `province`= ?, `pays`= ? WHERE id = ?"
-    const values = [
-        req.body.company_name,
-        req.body.address,
-        req.body.phone_number,
-        req.body.contact_name,
-        req.body.contact_email,
-        req.body.rccm,
-        req.body.idnate,
-        req.body.contact_phone,
-        req.body.apr,
-        req.body.province,
-        req.body.pays
-    ];
-    db.query(q, [...values,employeId], (err, data) => {
-        if (err) return res.send(err);
-        return res.json(data);
-      });
-}
+exports.updateClient = (req, res) => {
+  const employeeId = req.params.id;
+  const q = "UPDATE clients SET `company_name`= ?, `address`= ?, `phone_number`= ?, `contact_name`= ?, `contact_email`= ?, `rccm`= ?, `idnate`= ?, `contact_phone`= ?, `apr`= ?, `province`= ?, `pays`= ? WHERE id = ?";
+  const values = [
+    req.body.company_name,
+    req.body.address,
+    req.body.phone_number,
+    req.body.contact_name,
+    req.body.contact_email,
+    req.body.rccm,
+    req.body.idnate,
+    req.body.contact_phone,
+    req.body.apr,
+    req.body.province,
+    req.body.pays
+  ];
+  db.query(q, [...values, employeeId], (err, data) => {
+    if (err) return res.send(err);
+    return res.json({ message: "Mise à jour réussie" });
+  });
+};
 
 
 

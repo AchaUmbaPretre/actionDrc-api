@@ -81,6 +81,7 @@ const {
     postFonctionClient,
     postContratEmploie,
     postSites,
+    updateClient,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -120,7 +121,7 @@ router.get('/clientCount', getClientCount)
 router.get('/viewsClient/:id', viewsClient)
 router.post('/clientPost', postClient)
 router.delete('/client/:id', deleteClient)
-router.put('/client/:id', updateContrat)
+router.put('/client/:id', updateClient)
 
 
 router.get('/fonction', getFonction)
