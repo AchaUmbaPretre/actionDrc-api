@@ -83,6 +83,7 @@ const {
     postSites,
     updateClient,
     getContratEmploie,
+    getContratEmploieOne,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -107,6 +108,7 @@ router.get('/statusContrat', getStatusContrat)
 router.get('/contratInfo', getContratInfosAll)
 router.get('/contratInfo/:id', getContratInfosAllOne)
 router.get('/contratEmploie', getContratEmploie)
+router.get('/contratEmploie/:id', getContratEmploieOne)
 router.post('/contrat', postContrat)
 router.post('/contratEmploie', postContratEmploie)
 router.post('/ContratInfo', postContratInfo)

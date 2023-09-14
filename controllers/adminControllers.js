@@ -379,6 +379,17 @@ exports.getContratEmploie = (req, res) =>{
   })
 }
 
+exports.getContratEmploieOne = (req, res) =>{
+  const {id} = req.params;
+  const q = "SELECT affectations.id , emp1.avantages, emp1.salaire, emp1.prix,  emp2.first_name, emp2.last_name, emp2.skills, emp3.end_date, emp4.company_name FROM affectations INNER JOIN fonction_client AS emp1 ON affectations.fonction_clientId = emp1.id INNER JOIN employees AS emp2 ON affectations.emploie_id = emp2.id INNER JOIN contrats AS emp3 ON affectations.contrat_id = emp3.id INNER JOIN clients AS emp4 ON emp3.client_id = emp4.id WHERE affectations.id = ?";
+   
+  db.query(q ,id,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
 exports.postContratEmploie = (req, res) => {
   const q = 'INSERT INTO fonction_client(`contrat_id`, `client_id`, `skills`, `avantages`, `salaire`, `prix`) VALUES(?, ?, ?, ?, ?, ?)';
   const { contrat_id, client_id, skills, avantages, salaire, prix } = req.body;
@@ -683,7 +694,7 @@ exports.getAllAffectation = (req, res) => {
 
 exports.getAllAffectationOne = (req, res) => {
   const {id} = req.params;
-  const q = "SELECT affectations.id, emp1.first_name, emp1.last_name, emp1.skills, fonctions.nom, fonctions.salaire, contrats.end_date, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonctions ON affectations.fonction_id = fonctions.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id WHERE affectations.id = ?";
+  const q = "SELECT affectations.id, emp1.first_name, emp1.last_name, emp1.skills, fonction.contrat_id, fonction.avantages, fonction.salaire, fonction.prix, contrats.end_date, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction ON affectations.fonction_id = fonction.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id WHERE affectations.id = ?";
   db.query(q, id,(error, data) => {
     if (error) {
       return res.status(500).send(error);
