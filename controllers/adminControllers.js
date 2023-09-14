@@ -902,7 +902,7 @@ exports.getSalaireMission = (req, res)=>{
 }
 
 exports.getAllMission = (req, res) => {
-  const q = "SELECT heureEntrant, heureSortant, emp3.days, mission.id, emp1.first_name, emp2.company_name, sites.nom_site FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id INNER JOIN weekdays AS emp3 ON mission.jour = emp3.id INNER JOIN sites ON emp2.id = sites.client_id";
+  const q = "SELECT emp1.id AS idEmploye, heureEntrant, heureSortant, emp3.days, mission.id, emp1.first_name, emp2.company_name, sites.nom_site FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id INNER JOIN weekdays AS emp3 ON mission.jour = emp3.id INNER JOIN sites ON emp2.id = sites.client_id";
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
