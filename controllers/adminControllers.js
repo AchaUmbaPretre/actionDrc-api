@@ -441,13 +441,12 @@ exports.deleteContrat = (req, res) =>{
 
 exports.updateContrat = (req, res) =>{
     const contratId = req.params.id;
-    const q = "UPDATE employees SET `first_name`= ?, `last_name`= ?, `date_of_birth`= ?, `gender`= ?, `address`= ?,`phone_number`= ?, `email`= ?, `identification_number`= ?, `identification_type`= ?,`skills`= ?, `certifications`= ?, `employment_status`= ? WHERE id = ?"
+    const q = "UPDATE contrats SET `contract_type`= ?, `client_id`= ?, `start_date`= ?, `end_date`= ?, `contract_status`= ? WHERE id = ?"
     const values = [
         req.body.contract_type,
+        req.body.client_id,
         req.body.start_date,
         req.body.end_date,
-        req.body.hourly_rate,
-        req.body.benefits,
         req.body.contract_status,
     ]
 
