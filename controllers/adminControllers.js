@@ -369,6 +369,33 @@ exports.getContratInfosAllOne = (req, res) =>{
   })
 }
 
+exports.getContratFonctionAllOne = (req, res) =>{
+  const {id} = req.params
+  const q = "SELECT fonction.*,clients.company_name AS nom_client, competences.nom  FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN competences ON fonction.skills = competences.id WHERE fonction.id = ?";
+   
+  db.query(q ,id,(error, data)=>{
+      if(error) res.status(500).send(error)
+      return res.status(200).json(data);
+  })
+}
+exports.contratFonctionUpdate = (req, res) =>{
+  const contratId = req.params.id;
+  const q = "UPDATE fonction SET `contrat_id`= ?, `client_id`= ?, `skills`= ?, `avantages`= ?, `prix`= ?, `salaire`= ? WHERE id = ?"
+  const values = [
+      req.body.contrat_id,
+      req.body.client_id,
+      req.body.skills,
+      req.body.avantages,
+      req.body.prix,
+      req.body.salaire
+  ]
+
+  db.query(q, [...values,contratId], (err, data) => {
+      if (err) return res.send(err);
+      return res.json(data);
+    });
+}
+
 exports.getContratEmploie = (req, res) =>{
   const q = "SELECT affectations.id AS id, emp1.avantages AS ava2, emp1.salaire AS salaire2, emp1.prix AS prix2,  emp2.first_name AS first2, emp2.last_name AS last2, emp2.skills AS skills2, emp3.end_date AS date2, emp4.company_name AS company2 FROM affectations INNER JOIN fonction_client AS emp1 ON affectations.fonction_clientId = emp1.id INNER JOIN employees AS emp2 ON affectations.emploie_id = emp2.id INNER JOIN contrats AS emp3 ON affectations.contrat_id = emp3.id INNER JOIN clients AS emp4 ON emp3.client_id = emp4.id";
    
@@ -1202,7 +1229,7 @@ exports.updateFacture = (req, res) =>{
 }
 
 exports.getPayement = (req, res) =>{
-  const q = "SELECT * FROM payments";
+  const q = "SELECT payments.*, emp1.nom AS methode_paiement FROM payments INNER JOIN methode_paiement AS emp1 ON payments.payment_method = emp1.id";
    
   db.query(q ,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -1210,6 +1237,17 @@ exports.getPayement = (req, res) =>{
       return res.status(200).json(data);
   })
 }
+
+exports.getMethodePaiement = (req, res) =>{
+  const q = "SELECT * FROM methode_paiement";
+   
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
 exports.getPayementView = (req,res) =>{
   const {id} = req.params;
   const q = "SELECT * FROM payments where id = ?";

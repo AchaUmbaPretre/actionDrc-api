@@ -84,6 +84,9 @@ const {
     updateClient,
     getContratEmploie,
     getContratEmploieOne,
+    getContratFonctionAllOne,
+    contratFonctionUpdate,
+    getMethodePaiement,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -105,8 +108,6 @@ router.get('/contrat/views/:id', viewsContrat)
 router.get('/avantages', getAvantage)
 router.get('/contratType', getContratType)
 router.get('/statusContrat', getStatusContrat)
-router.get('/contratInfo', getContratInfosAll)
-router.get('/contratInfo/:id', getContratInfosAllOne)
 router.get('/contratEmploie', getContratEmploie)
 router.get('/contratEmploie/:id', getContratEmploieOne)
 router.post('/contrat', postContrat)
@@ -114,6 +115,11 @@ router.post('/contratEmploie', postContratEmploie)
 router.post('/ContratInfo', postContratInfo)
 router.delete('/contrat/:id', deleteContrat)
 router.put('/contrat/:id', updateContrat)
+
+router.get('/contratInfo', getContratInfosAll)
+router.get('/contratInfo/:id', getContratInfosAllOne)
+router.get('/contratFonctionOne/:id', getContratFonctionAllOne)
+router.put('/contratFonctionUpdate/:id', contratFonctionUpdate)
 
 
 router.get('/client', getClient)
@@ -130,7 +136,6 @@ router.get('/fonction', getFonction)
 router.get('/fonctionDetail/:id', getFonctionDetail)
 router.get('/emploieDispo', getEmploieDispo)
 router.post('/postFonctionClient', postFonctionClient)
-router.put('fonctionUpdate', )
 router.put('/employeFonctionPut/:id', updateEmployeFonction)
 
 
@@ -180,6 +185,7 @@ router.delete('/facture/:id', deleteFacture);
 router.put('/factureUpdate/:id', updateFacture)
 
 router.get('/payement', getPayement);
+router.get('/paiementMethode', getMethodePaiement);
 router.get('/payementAll', getPayementAll);
 router.get('/payementView', getAllFactureView);
 router.post('/payementPost', postPayement);
