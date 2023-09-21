@@ -671,7 +671,6 @@ exports.postAffectation = (req, res) =>{
 
     db.query(q, [values], (error,data)=>{
         if(error) res.status(500).json(error)
-        console.log(error)
         return res.json('processus reussi');
     })
 }
@@ -741,7 +740,7 @@ exports.deleteAffectation = (req, res) =>{
 }
 
 exports.getMission = (req,res) =>{
-    const q = "SELECT * FROM mission";
+    const q = "SELECT mission.*,emp3.days FROM mission INNER JOIN weekdays AS emp3 ON mission.jour = emp3.id";
      
     db.query(q ,(error, data)=>{
         if(error) res.status(500).send(error)
@@ -896,10 +895,10 @@ exports.updateMission = (req, res) =>{
 
 exports.deleteMission = (req, res) =>{
 
-    const clientId = req.params.id;
-    const q = "DELETE FROM mission WHERE id = ?"
+    const id = req.params.id;
+    const q = `DELETE mission FROM mission INNER JOIN weekdays AS emp3 ON mission.jour = emp3.id INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id INNER JOIN sites AS emp4 ON mission.site = emp4.id WHERE emp1.id = ?`
 
-    db.query(q, [clientId], (err, data)=>{
+    db.query(q, [id], (err, data)=>{
         if (err) return res.send(err);
       return res.json(data);
     })
@@ -928,7 +927,26 @@ exports.getSalaireMission = (req, res)=>{
 }
 
 exports.getAllMission = (req, res) => {
-  const q = "SELECT emp1.id AS idEmploye, heureEntrant, heureSortant, emp3.days, mission.id, emp1.first_name, emp2.company_name, sites.nom_site FROM mission INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id INNER JOIN weekdays AS emp3 ON mission.jour = emp3.id INNER JOIN sites ON emp2.id = sites.client_id";
+  const q = `SELECT
+  emp1.id AS agent_id,
+  emp1.first_name,
+  emp2.company_name,
+  emp3.days,
+  CASE
+    WHEN mission.heureEntrant = '00:00' THEN 'Fermé'
+    ELSE mission.heureEntrant
+  END AS heureEntrant,
+  CASE
+    WHEN mission.heureSortant = '00:00' THEN 'Fermé'
+    ELSE mission.heureSortant
+  END AS heureSortant,
+  emp4.nom_site
+FROM mission
+INNER JOIN weekdays AS emp3 ON mission.jour = emp3.id
+INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id
+INNER JOIN clients AS emp2 ON mission.client_id = emp2.id
+INNER JOIN sites AS emp4 ON mission.site = emp4.id;`
+
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
