@@ -378,6 +378,17 @@ exports.getContratFonctionAllOne = (req, res) =>{
       return res.status(200).json(data);
   })
 }
+
+exports.deleteContratInfo = (req, res) =>{
+  const {id} = req.params
+  const q = "DELETE fonction FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN competences ON fonction.skills = competences.id WHERE fonction.id = ?";
+   
+  db.query(q ,id,(error, data)=>{
+      if(error) res.status(500).send(error)
+      return res.status(200).json(data);
+  })
+}
+
 exports.contratFonctionUpdate = (req, res) =>{
   const contratId = req.params.id;
   const q = "UPDATE fonction SET `contrat_id`= ?, `client_id`= ?, `skills`= ?, `avantages`= ?, `prix`= ?, `salaire`= ? WHERE id = ?"
@@ -653,10 +664,6 @@ exports.updateEmployeFonction = (req, res)=> {
       return res.json(data);
     });
 }
-/* exports.updateFonctionOne =(req,res)=>{
-  const {id} = req.params;
-  const q = 
-} */
 
 
 
@@ -1187,7 +1194,7 @@ exports.getAllFacture = (req, res) => {
 
 exports.getAllFactureView = (req, res) => {
   const {id} = req.params;
-  const q = "SELECT invoices.id, invoice_date, due_date, total_amount,status , emp2.company_name FROM invoices INNER JOIN clients AS emp2 ON invoices.client_id = emp2.id where invoices.id = ?";
+  const q = "SELECT invoices.id, invoice_date, due_date, total_amount,status , emp2.company_name, emp2.address FROM invoices INNER JOIN clients AS emp2 ON invoices.client_id = emp2.id where invoices.id = ?";
   db.query(q,id, (error, data) => {
     if (error) {
       return res.status(500).send(error);
@@ -1266,20 +1273,11 @@ exports.getMethodePaiement = (req, res) =>{
   })
 }
 
+
 exports.getPayementView = (req,res) =>{
   const {id} = req.params;
-  const q = "SELECT * FROM payments where id = ?";
-   
-  db.query(q ,id, (error, data)=>{
-      if(error) res.status(500).send(error)
-
-      return res.status(200).json(data);
-  })
-}
-
-exports.getPayementAll = (req,res) =>{
-  const q =  'SELECT payments.*, invoices.status FROM payments INNER JOIN invoices ON payments.invoice_id = invoices.id';
-      db.query(q,(error, data)=>{
+  const q =  'SELECT payments.*, emp1.nom AS methode_paiement, emp3.company_name, emp3.address FROM payments INNER JOIN methode_paiement AS emp1 ON payments.payment_method = emp1.id INNER JOIN invoices AS emp2 ON payments.invoice_id = emp2.id INNER JOIN clients AS emp3 ON emp2.client_id = emp3.id where payments.id = ?';
+      db.query(q,id ,(error, data)=>{
         if(error) res.status(500).send(error)
 
       return res.status(200).json(data);
@@ -1311,5 +1309,16 @@ exports.deletePayement = (req, res) =>{
   db.query(q, [clientId], (err, data)=>{
       if (err) return res.send(err);
     return res.json(data);
+  })
+}
+
+exports.getMois = (req, res) => {
+
+  const q = "SELECT * FROM mois";
+   
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
   })
 }

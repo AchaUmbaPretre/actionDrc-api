@@ -87,6 +87,9 @@ const {
     getContratFonctionAllOne,
     contratFonctionUpdate,
     getMethodePaiement,
+    getMois,
+    getPayementView,
+    deleteContratInfo,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -119,6 +122,7 @@ router.put('/contrat/:id', updateContrat)
 router.get('/contratInfo', getContratInfosAll)
 router.get('/contratInfo/:id', getContratInfosAllOne)
 router.get('/contratFonctionOne/:id', getContratFonctionAllOne)
+router.delete('/contratInfo/:id', deleteContratInfo)
 router.put('/contratFonctionUpdate/:id', contratFonctionUpdate)
 
 
@@ -186,9 +190,10 @@ router.put('/factureUpdate/:id', updateFacture)
 
 router.get('/payement', getPayement);
 router.get('/paiementMethode', getMethodePaiement);
-router.get('/payementAll', getPayementAll);
-router.get('/payementView', getAllFactureView);
+router.get('/payementView/:id', getPayementView);
 router.post('/payementPost', postPayement);
 router.delete('/payement/:id', deletePayement);
+
+router.get('/mois', getMois)
 
 module.exports = router;
