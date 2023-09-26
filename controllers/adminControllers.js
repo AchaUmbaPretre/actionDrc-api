@@ -302,6 +302,17 @@ exports.getStatusContrat = (req, res) =>{
     })
 }
 
+exports.getcontratTitle = (req, res) =>{
+  const {id} = req.params;
+  const q = "SELECT clients.company_name FROM contrats INNER JOIN clients ON contrats.client_id = clients.id where contrats.id = ?";
+   
+  db.query(q , id,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
 exports.postContrat = (req, res) => {
   const q = 'INSERT INTO contrats(`contract_type`, `client_id`, `start_date`, `end_date`, `duree`, `contract_status`) VALUES(?, ?, ?, ?, ?,?)';
 
@@ -350,7 +361,7 @@ exports.getContratInfo = (req, res) =>{
 }
 
 exports.getContratInfosAll = (req, res) =>{
-  const q = "SELECT fonction.*,clients.company_name AS nom_client, competences.nom FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN competences ON fonction.skills = competences.id";
+  const q = "SELECT fonction.*,clients.company_name AS nom_client, competences.nom, competences.id AS id_competence FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN competences ON fonction.skills = competences.id";
    
   db.query(q ,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -361,7 +372,7 @@ exports.getContratInfosAll = (req, res) =>{
 
 exports.getContratInfosAllOne = (req, res) =>{
   const {id} = req.params
-  const q = "SELECT fonction.*,clients.company_name AS nom_client, competences.nom  FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN competences ON fonction.skills = competences.id WHERE fonction.contrat_id = ?";
+  const q = "SELECT fonction.*,clients.company_name AS nom_client, competences.nom, competences.id AS id_competence  FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN competences ON fonction.skills = competences.id WHERE fonction.contrat_id = ?";
    
   db.query(q ,id,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -408,7 +419,7 @@ exports.contratFonctionUpdate = (req, res) =>{
 }
 
 exports.getContratEmploie = (req, res) =>{
-  const q = "SELECT affectations.id AS id, emp1.avantages AS ava2, emp1.salaire AS salaire2, emp1.prix AS prix2,  emp2.first_name AS first2, emp2.last_name AS last2, emp2.skills AS skills2, emp3.end_date AS date2, emp4.company_name AS company2 FROM affectations INNER JOIN fonction_client AS emp1 ON affectations.fonction_clientId = emp1.id INNER JOIN employees AS emp2 ON affectations.emploie_id = emp2.id INNER JOIN contrats AS emp3 ON affectations.contrat_id = emp3.id INNER JOIN clients AS emp4 ON emp3.client_id = emp4.id";
+  const q = "SELECT affectations.id AS id, affectations.created_at, emp1.avantages AS ava2, emp1.salaire AS salaire2, emp1.prix AS prix2,  emp2.first_name AS first2, emp2.last_name AS last2, emp2.skills AS skills2, emp3.end_date AS date2, emp4.company_name AS company2 FROM affectations INNER JOIN fonction_client AS emp1 ON affectations.fonction_clientId = emp1.id INNER JOIN employees AS emp2 ON affectations.emploie_id = emp2.id INNER JOIN contrats AS emp3 ON affectations.contrat_id = emp3.id INNER JOIN clients AS emp4 ON emp3.client_id = emp4.id";
    
   db.query(q ,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -704,6 +715,18 @@ exports.getAffectation = (req,res) =>{
         return res.status(200).json(data);
     })
 }
+
+exports.getAffectationUn = (req,res) =>{
+  const {id} = req.params;
+  const q = "SELECT * FROM affectations where id = ?";
+   
+  db.query(q ,id,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
 exports.getAffectationCount = (req, res) => {
   const q = "SELECT count(*) as total FROM affectations";
 
@@ -715,7 +738,7 @@ exports.getAffectationCount = (req, res) => {
 }
 
 exports.getAllAffectation = (req, res) => {
-  const q = "SELECT affectations.id, emp1.first_name, emp1.last_name, emp1.skills, fonction.contrat_id, fonction.avantages, fonction.salaire, fonction.prix, contrats.end_date, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction ON affectations.fonction_id = fonction.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id";
+  const q = "SELECT affectations.id,affectations.created_at, emp1.first_name, emp1.last_name, emp1.skills, fonction.contrat_id, fonction.avantages, fonction.salaire, fonction.prix, contrats.end_date, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction ON affectations.fonction_id = fonction.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id";
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
@@ -745,6 +768,33 @@ exports.deleteAffectation = (req, res) =>{
       return res.json(data);
     })
 }
+
+exports.affectationUpdate = (req, res) => {
+  const { id } = req.params;
+  // Récupérer les données à mettre à jour depuis le corps de la requête (req.body)
+  const updatedData = req.body;
+
+  delete updatedData.first_name;
+  delete updatedData.last_name;
+  delete updatedData.skills;
+  delete updatedData.client_nom;
+  delete updatedData.end_date;
+  delete updatedData.avantages
+
+
+  const q = "UPDATE affectations SET ? WHERE id = ?";
+  db.query(q, [updatedData, id], (error, result) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Affectation not found" });
+    }
+
+    return res.status(200).json({ message: "Affectation updated successfully" });
+  });
+};
 
 exports.getMission = (req,res) =>{
     const q = "SELECT mission.*,emp3.days FROM mission INNER JOIN weekdays AS emp3 ON mission.jour = emp3.id";

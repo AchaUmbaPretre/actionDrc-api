@@ -90,6 +90,9 @@ const {
     getMois,
     getPayementView,
     deleteContratInfo,
+    getcontratTitle,
+    affectationUpdate,
+    getAffectationUn,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -113,6 +116,7 @@ router.get('/contratType', getContratType)
 router.get('/statusContrat', getStatusContrat)
 router.get('/contratEmploie', getContratEmploie)
 router.get('/contratEmploie/:id', getContratEmploieOne)
+router.get('/contratTitle/:id', getcontratTitle)
 router.post('/contrat', postContrat)
 router.post('/contratEmploie', postContratEmploie)
 router.post('/ContratInfo', postContratInfo)
@@ -146,9 +150,11 @@ router.put('/employeFonctionPut/:id', updateEmployeFonction)
 router.get('/affectationCount', getAffectationCount)
 router.post('/affectations', postAffectation)
 router.get('/affectation', getAffectation)
+router.get('/affectation/:id', getAffectationUn)
 router.get('/affectations/:id', getAllAffectationOne)
 router.get('/allaffectation', getAllAffectation)
 router.delete('/deleteAff/:id', deleteAffectation)
+router.put('/affectationPut/:id', affectationUpdate)
 
 router.get('/mission', getMission)
 router.get('/missionWeek', getMissionWeek)
