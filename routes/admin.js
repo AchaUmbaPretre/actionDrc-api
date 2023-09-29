@@ -75,7 +75,6 @@ const {
     viewsEmploye,
     getAllAffectationOne,
     postContratInfo,
-    getContratInfo,
     getContratInfosAll,
     getContratInfosAllOne,
     postFonctionClient,
@@ -96,6 +95,8 @@ const {
     getMissionContratTitle,
     getFactureCalcul,
     getFactureCalculTotal,
+    getFactureContratCount,
+    getSiteAll,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -161,8 +162,6 @@ router.put('/affectationPut/:id', affectationUpdate)
 
 router.get('/mission', getMission)
 router.get('/missionWeek', getMissionWeek)
-router.get('/sites/:id', getSite)
-router.post('/sites',postSites)
 router.get('/missionView/:id', getMissionView)
 router.get('/missionContrat/:id', getMissionContrat)
 router.get('/missionContratTitle/:id', getMissionContratTitle)
@@ -174,6 +173,10 @@ router.get('/missionAllView/:id',getAllMissionView)
 router.get('/duration', getDuration)
 router.get('/salaireMission', getSalaireMission)
 router.put('/updateMission/:id', updateMission)
+
+router.get('/sites', getSiteAll)
+router.get('/sites/:id', getSite)
+router.post('/sites',postSites)
 
 router.get('/horaire', getHoraire)
 router.post('/horairesPost', postHoraire)
@@ -195,6 +198,7 @@ router.get('/facture', getFacture);
 router.get('/factureAll', getAllFacture);
 router.get('/factureCalcul/:id', getFactureCalcul);
 router.get('/factureCalculTotal/:id', getFactureCalculTotal);
+router.get('/factureContratCount/:id', getFactureContratCount);
 router.get('/factureAllView/:id', getAllFactureView);
 router.post('/factures', postFacture);
 router.delete('/facture/:id', deleteFacture);

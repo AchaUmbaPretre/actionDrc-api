@@ -809,7 +809,7 @@ exports.getMission = (req,res) =>{
 
 exports.getSite = (req,res) =>{
   const {id} = req.params
-  const q = "SELECT * FROM sites WHERE client_id = ?";
+  const q = "SELECT * FROM sites_travail WHERE client_id = ?";
    
   db.query(q ,id,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -818,12 +818,27 @@ exports.getSite = (req,res) =>{
   })
 }
 
+exports.getSiteAll = (req,res) =>{
+  const q = "SELECT * FROM sites_travail";
+   
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
 exports.postSites = (req, res) => {
-  const q = 'INSERT INTO sites(`client_id`, `nom_site`) VALUES(?, ?)';
+  const q = 'INSERT INTO sites_travail(`client_id`, `avenue`, `quartier`, `commune`, `numero`, `description`) VALUES(?,?,?,?,?,?)';
 
-  const { client_id, nom_site} = req.body;
-
-  const values = [client_id, nom_site];
+  const values = [
+        req.body.client_id,
+        req.body.avenue,
+        req.body.quartier,
+        req.body.commune,
+        req.body.numero,
+        req.body.description
+  ];
 
   db.query(q, values, (error, data) => {
     if (error) {
@@ -882,7 +897,7 @@ exports.getMissionContrat = (req,res) =>{
 
 exports.getMissionContratTitle = (req, res) =>{
   const {id} = req.params;
-  const q = "SELECT contrats.id,clients.company_name FROM contrats INNER JOIN clients ON contrats.client_id = clients.id where contrats.client_id = ?";
+  const q = "SELECT contrats.id,clients.company_name, contrats.contract_type FROM contrats INNER JOIN clients ON contrats.client_id = clients.id where contrats.client_id = ?";
    
   db.query(q , id,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -1274,7 +1289,7 @@ exports.getFactureCalcul = (req, res) => {
 exports.getFactureCalculTotal = (req, res) => {
   const { id } = req.params;
   const q = `
-  SELECT SUM(fonction.prix) AS montant_total, contrats.id, clients.company_name FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction ON contrats.id = fonction.contrat_id WHERE employees.contrat_id = ?;
+  SELECT SUM(fonction.prix) AS montant_total, contrats.id, contrats.contract_type, clients.company_name FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction ON contrats.id = fonction.contrat_id WHERE employees.contrat_id = ?;
   `;
   
   db.query(q, id, (error, data) => {
@@ -1285,6 +1300,17 @@ exports.getFactureCalculTotal = (req, res) => {
     }
   });
 };
+
+exports.getFactureContratCount = (req, res) => {
+  const {id} = req.params;
+  const q = "SELECT count(*) as total FROM employees WHERE employees.contrat_id = ?";
+
+  db.query(q ,id,(error, data)=>{
+    if(error) res.status(500).send(error)
+
+    return res.status(200).json(data);
+})
+}
 
 exports.getAllFactureView = (req, res) => {
   const {id} = req.params;
