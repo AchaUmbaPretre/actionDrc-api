@@ -93,6 +93,9 @@ const {
     getcontratTitle,
     affectationUpdate,
     getAffectationUn,
+    getMissionContratTitle,
+    getFactureCalcul,
+    getFactureCalculTotal,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -162,6 +165,7 @@ router.get('/sites/:id', getSite)
 router.post('/sites',postSites)
 router.get('/missionView/:id', getMissionView)
 router.get('/missionContrat/:id', getMissionContrat)
+router.get('/missionContratTitle/:id', getMissionContratTitle)
 router.get('/contrats/:contratId/agents', getContratAff)
 router.post('/missions', postMission)
 router.delete('/mission/:id',deleteMission)
@@ -189,6 +193,8 @@ router.put('/presencePut/:id', updatePresence)
 router.get('/statusFacture', getMontantStatus);
 router.get('/facture', getFacture);
 router.get('/factureAll', getAllFacture);
+router.get('/factureCalcul/:id', getFactureCalcul);
+router.get('/factureCalculTotal/:id', getFactureCalculTotal);
 router.get('/factureAllView/:id', getAllFactureView);
 router.post('/factures', postFacture);
 router.delete('/facture/:id', deleteFacture);

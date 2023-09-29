@@ -419,13 +419,14 @@ exports.contratFonctionUpdate = (req, res) =>{
 }
 
 exports.getContratEmploie = (req, res) =>{
-  const q = "SELECT affectations.id AS id, affectations.created_at, emp1.avantages AS ava2, emp1.salaire AS salaire2, emp1.prix AS prix2,  emp2.first_name AS first2, emp2.last_name AS last2, emp2.skills AS skills2, emp3.end_date AS date2, emp4.company_name AS company2 FROM affectations INNER JOIN fonction_client AS emp1 ON affectations.fonction_clientId = emp1.id INNER JOIN employees AS emp2 ON affectations.emploie_id = emp2.id INNER JOIN contrats AS emp3 ON affectations.contrat_id = emp3.id INNER JOIN clients AS emp4 ON emp3.client_id = emp4.id";
+  const q = "SELECT affectations.id AS id, affectations.created_at, emp1.avantages AS ava2, emp1.salaire AS salaire2, emp1.prix AS prix2,  emp2.first_name AS first2, emp2.last_name AS last2, emp2.skills AS skills2, emp3.end_date AS date2, emp3.contract_type, emp3.id AS contrat_ID, emp4.company_name AS company2 FROM affectations INNER JOIN fonction_client AS emp1 ON affectations.fonction_clientId = emp1.id INNER JOIN employees AS emp2 ON affectations.emploie_id = emp2.id INNER JOIN contrats AS emp3 ON affectations.contrat_id = emp3.id INNER JOIN clients AS emp4 ON emp3.client_id = emp4.id";
    
   db.query(q ,(error, data)=>{
       if(error) res.status(500).send(error)
 
       return res.status(200).json(data);
   })
+
 }
 
 exports.getContratEmploieOne = (req, res) =>{
@@ -738,7 +739,7 @@ exports.getAffectationCount = (req, res) => {
 }
 
 exports.getAllAffectation = (req, res) => {
-  const q = "SELECT affectations.id,affectations.created_at, emp1.first_name, emp1.last_name, emp1.skills, fonction.contrat_id, fonction.avantages, fonction.salaire, fonction.prix, contrats.end_date, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction ON affectations.fonction_id = fonction.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id";
+  const q = "SELECT affectations.id,affectations.created_at, emp1.first_name, emp1.last_name, emp1.skills, fonction.contrat_id, fonction.avantages, fonction.salaire, fonction.prix, contrats.end_date, contrats.	contract_type, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction ON affectations.fonction_id = fonction.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id";
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
@@ -856,7 +857,7 @@ exports.getMissionWeek = (req,res) =>{
 }
 exports.getMissionContrat = (req,res) =>{
   const {id} = req.params;
-  const q = "SELECT * FROM contrats where client_id = ?";
+  const q = "SELECT contrats.*, clients.company_name FROM contrats INNER JOIN  clients ON contrats.client_id = clients.id where client_id = ?";
    
   db.query(q ,id, (error, data)=>{
       if(error) res.status(500).send(error)
@@ -879,6 +880,16 @@ exports.getMissionContrat = (req,res) =>{
     });
 }
 
+exports.getMissionContratTitle = (req, res) =>{
+  const {id} = req.params;
+  const q = "SELECT contrats.id,clients.company_name FROM contrats INNER JOIN clients ON contrats.client_id = clients.id where contrats.client_id = ?";
+   
+  db.query(q , id,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
 exports.getContratAff = (req, res)=>{
   const contratId = req.params.contratId;
 
@@ -934,12 +945,14 @@ exports.postMission = (req, res) => {
 
 exports.updateMission = (req, res) =>{
   const { id } = req.params;
-  const {agent_id, client_id, dateEntrant, dateSortant, duree, montant } = req.body;
+  const update = updatedData = req.body;
+  
+  /* const {agent_id, client_id, dateEntrant, dateSortant, duree, montant } = req.body; */
 
-  const query = `UPDATE mission SET agent_id = ?, client_id = ?, dateEntrant = ?, dateSortant = ?, jour = ?, montant = ? WHERE id = ?`;
-  const values = [agent_id , client_id, dateEntrant, dateSortant, jour, montant, id];
+  const query = `UPDATE mission SET heureEntrant = ?, heureSortant = ? WHERE id = ?`;
+  const values = [req.body.heureEntrant, req.body.heureSortant];
 
-  db.query(query, values, (error, result) => {
+  db.query(query, [...values,id], (error, result) => {
     if (error) {
       console.error(error);
       res.status(500).json({ error: 'Échec de la mise à jour de mission' });
@@ -985,6 +998,7 @@ exports.getSalaireMission = (req, res)=>{
 
 exports.getAllMission = (req, res) => {
   const q = `SELECT
+  mission.id AS mission_id,
   emp1.id AS agent_id,
   emp1.first_name,
   emp2.company_name,
@@ -1241,6 +1255,36 @@ exports.getAllFacture = (req, res) => {
     return res.status(200).json(data);
   });
 }
+
+exports.getFactureCalcul = (req, res) => {
+  const { id } = req.params;
+  const q = `
+  SELECT employees.id, employees.first_name, employees.last_name,employees.skills, clients.company_name AS nom_client, fonction.prix FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction ON contrats.id = fonction.contrat_id WHERE employees.contrat_id = ?;
+  `;
+  
+  db.query(q, id, (error, data) => {
+    if (error) {
+      res.status(500).send(error);
+    } else {
+      res.status(200).json(data);
+    }
+  });
+};
+
+exports.getFactureCalculTotal = (req, res) => {
+  const { id } = req.params;
+  const q = `
+  SELECT SUM(fonction.prix) AS montant_total, contrats.id, clients.company_name FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction ON contrats.id = fonction.contrat_id WHERE employees.contrat_id = ?;
+  `;
+  
+  db.query(q, id, (error, data) => {
+    if (error) {
+      res.status(500).send(error);
+    } else {
+      res.status(200).json(data);
+    }
+  });
+};
 
 exports.getAllFactureView = (req, res) => {
   const {id} = req.params;
