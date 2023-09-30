@@ -1325,12 +1325,12 @@ exports.getAllFactureView = (req, res) => {
 }
 
 exports.postFacture = async (req, res) => {
-  const { client_id, invoice_date, due_date, total_amount, status } = req.body;
+  const { client_id, total_amount, status } = req.body;
 
   try {
-    const montantQuery = 'INSERT INTO invoices (client_id, invoice_date, due_date, total_amount, status) VALUES (?, ?, ?, ?, ?)';
+    const montantQuery = 'INSERT INTO invoices (client_id, total_amount, status) VALUES (?, ?, ?)';
 
-    db.query(montantQuery, [client_id, invoice_date, due_date, total_amount, status], (error, result) => {
+    db.query(montantQuery, [client_id, total_amount, status], (error, result) => {
       if (error) {
         console.error("Erreur lors de la création de la facture : ", error);
         res.status(500).json({ error: "Erreur lors de la création de la facture" });
