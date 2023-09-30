@@ -1314,13 +1314,26 @@ exports.getFactureContratCount = (req, res) => {
 
 exports.getAllFactureView = (req, res) => {
   const {id} = req.params;
-  const q = "SELECT invoices.id, invoice_date, due_date, total_amount,status , emp2.company_name, emp2.address FROM invoices INNER JOIN clients AS emp2 ON invoices.client_id = emp2.id where invoices.id = ?";
+  const q = "SELECT invoices.id, invoices.created_at, total_amount,status, emp2.company_name, emp2.address, sites_travail.avenue, sites_travail.quartier, sites_travail.commune, sites_travail.numero FROM invoices INNER JOIN clients AS emp2 ON invoices.client_id = emp2.id INNER JOIN sites_travail ON emp2.id = sites_travail.client_id where invoices.id = ?";
   db.query(q,id, (error, data) => {
     if (error) {
       return res.status(500).send(error);
     }
+    if (data.length === 0) {
+      return res.status(404).json({ message: "Facture non trouvée" });
+    }
+
+    const facture = data[0];
+    const montantInitial = facture.total_amount;
+    const tauxTVA = 0.16;
+
+    const montantTVA = montantInitial * tauxTVA;
+    const montantTotal = montantInitial + montantTVA;
+
+    facture.montant_tva = montantTVA;
+    facture.montant_total = montantTotal;
     
-    return res.status(200).json(data);
+    return res.status(200).json(facture);
   });
 }
 
