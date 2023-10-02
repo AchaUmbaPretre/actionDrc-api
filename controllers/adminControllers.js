@@ -431,7 +431,7 @@ exports.getContratEmploie = (req, res) =>{
 
 exports.getContratEmploieOne = (req, res) =>{
   const {id} = req.params;
-  const q = "SELECT affectations.id , emp1.avantages, emp1.salaire, emp1.prix,  emp2.first_name, emp2.last_name, emp2.skills, emp3.end_date, emp4.company_name FROM affectations INNER JOIN fonction_client AS emp1 ON affectations.fonction_clientId = emp1.id INNER JOIN employees AS emp2 ON affectations.emploie_id = emp2.id INNER JOIN contrats AS emp3 ON affectations.contrat_id = emp3.id INNER JOIN clients AS emp4 ON emp3.client_id = emp4.id WHERE affectations.id = ?";
+  const q = "SELECT affectations.id , emp1.avantages, emp1.salaire, emp1.prix,  emp2.first_name, emp2.last_name, emp2.skills, emp3.end_date, emp3.contract_type, emp4.company_name FROM affectations INNER JOIN fonction_client AS emp1 ON affectations.fonction_clientId = emp1.id INNER JOIN employees AS emp2 ON affectations.emploie_id = emp2.id INNER JOIN contrats AS emp3 ON affectations.contrat_id = emp3.id INNER JOIN clients AS emp4 ON emp3.client_id = emp4.id WHERE affectations.id = ?";
    
   db.query(q ,id,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -750,7 +750,7 @@ exports.getAllAffectation = (req, res) => {
 
 exports.getAllAffectationOne = (req, res) => {
   const {id} = req.params;
-  const q = "SELECT affectations.id, emp1.first_name, emp1.last_name, emp1.skills, fonction.contrat_id, fonction.avantages, fonction.salaire, fonction.prix, contrats.end_date, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction ON affectations.fonction_id = fonction.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id WHERE affectations.id = ?";
+  const q = "SELECT affectations.id, emp1.first_name, emp1.last_name, emp1.skills, fonction.contrat_id, fonction.avantages, fonction.salaire, fonction.prix, contrats.end_date, contrats.contract_type, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction ON affectations.fonction_id = fonction.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id WHERE affectations.id = ?";
   db.query(q, id,(error, data) => {
     if (error) {
       return res.status(500).send(error);
@@ -807,6 +807,18 @@ exports.getMission = (req,res) =>{
     })
 }
 
+
+exports.getSiteOne = (req,res) =>{
+  const {id} = req.params;
+
+  const q = "SELECT sites_travail.*, emp1.company_name FROM sites_travail INNER JOIN clients AS emp1 ON sites_travail.client_id = emp1.id WHERE sites_travail.id = ?";
+   
+  db.query(q ,id,(error, data)=>{
+      if(error) res.status(500).send(error)
+      return res.status(200).json(data);
+  })
+}
+
 exports.getSite = (req,res) =>{
   const {id} = req.params
   const q = "SELECT * FROM sites_travail WHERE client_id = ?";
@@ -819,7 +831,7 @@ exports.getSite = (req,res) =>{
 }
 
 exports.getSiteAll = (req,res) =>{
-  const q = "SELECT * FROM sites_travail";
+  const q = "SELECT sites_travail.*, emp1.company_name FROM sites_travail INNER JOIN clients AS emp1 ON sites_travail.client_id = emp1.id";
    
   db.query(q ,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -849,6 +861,39 @@ exports.postSites = (req, res) => {
     }
   });
 }
+
+
+exports.deleteSite = (req,res) =>{
+  const {id} = req.params
+  const q = "DELETE * FROM sites_travail WHERE client_id = ?";
+   
+  db.query(q ,id,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
+exports.sitesUpdate = (req, res) => {
+  const { id } = req.params;
+  const updatedData = req.body;
+
+  delete updatedData.company_name
+
+  const q = "UPDATE sites_travail SET ? WHERE id = ?";
+  db.query(q, [updatedData, id], (error, result) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+
+    if (result === 0) {
+      return res.status(404).json({ message: "sites not found" });
+    }
+
+    return res.status(200).json({ message: "Site est modifié avec succes" });
+  });
+};
+
 
 exports.getMissionView = (req,res) =>{
     const {id} = req.params;
@@ -1314,7 +1359,7 @@ exports.getFactureContratCount = (req, res) => {
 
 exports.getAllFactureView = (req, res) => {
   const {id} = req.params;
-  const q = "SELECT invoices.id, invoices.created_at, total_amount,status, emp2.company_name, emp2.address, sites_travail.avenue, sites_travail.quartier, sites_travail.commune, sites_travail.numero FROM invoices INNER JOIN clients AS emp2 ON invoices.client_id = emp2.id INNER JOIN sites_travail ON emp2.id = sites_travail.client_id where invoices.id = ?";
+  const q = "SELECT invoices.id, invoices.created_at, total_amount,status, emp2.company_name, emp2.id AS client_id, emp2.address, sites_travail.avenue, sites_travail.quartier, sites_travail.commune, sites_travail.numero FROM invoices INNER JOIN clients AS emp2 ON invoices.client_id = emp2.id INNER JOIN sites_travail ON emp2.id = sites_travail.client_id where invoices.id = ?";
   db.query(q,id, (error, data) => {
     if (error) {
       return res.status(500).send(error);

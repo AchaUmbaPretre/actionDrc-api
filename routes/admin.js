@@ -97,6 +97,9 @@ const {
     getFactureCalculTotal,
     getFactureContratCount,
     getSiteAll,
+    deleteSite,
+    sitesUpdate,
+    getSiteOne,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -175,8 +178,11 @@ router.get('/salaireMission', getSalaireMission)
 router.put('/updateMission/:id', updateMission)
 
 router.get('/sites', getSiteAll)
+router.get('/sitesOne/:id', getSiteOne)
 router.get('/sites/:id', getSite)
 router.post('/sites',postSites)
+router.delete('/siteDelete/:id',deleteSite)
+router.put('/sitesUpdate/:id',sitesUpdate)
 
 router.get('/horaire', getHoraire)
 router.post('/horairesPost', postHoraire)
