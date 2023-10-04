@@ -121,6 +121,7 @@ exports.postEmploye = (req, res) => {
 
     db.query(q, [values], (error,data)=>{
         if(error) res.status(500).json(error)
+        console.log(error)
 
         return res.json('processus reussi');
     })
@@ -887,7 +888,7 @@ exports.sitesUpdate = (req, res) => {
     }
 
     if (result === 0) {
-      return res.status(404).json({ message: "sites not found" });
+      return res.status(404).json({ message: "site not found" });
     }
 
     return res.status(200).json({ message: "Site est modifié avec succes" });
@@ -1025,8 +1026,9 @@ exports.updateMission = (req, res) =>{
 
 exports.deleteMission = (req, res) =>{
 
-    const id = req.params.id;
-    const q = `DELETE mission FROM mission INNER JOIN weekdays AS emp3 ON mission.jour = emp3.id INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id INNER JOIN sites AS emp4 ON mission.site = emp4.id WHERE emp1.id = ?`
+    const {id} = req.params;
+    console.log(id)
+    const q = `DELETE mission FROM mission INNER JOIN weekdays AS emp3 ON mission.jour = emp3.id INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id INNER JOIN clients AS emp2 ON mission.client_id = emp2.id WHERE mission.agent_id = ?`
 
     db.query(q, [id], (err, data)=>{
         if (err) return res.send(err);
@@ -1070,13 +1072,11 @@ exports.getAllMission = (req, res) => {
   CASE
     WHEN mission.heureSortant = '00:00' THEN 'Fermé'
     ELSE mission.heureSortant
-  END AS heureSortant,
-  emp4.nom_site
+  END AS heureSortant
 FROM mission
 INNER JOIN weekdays AS emp3 ON mission.jour = emp3.id
 INNER JOIN employees AS emp1 ON mission.agent_id = emp1.id
-INNER JOIN clients AS emp2 ON mission.client_id = emp2.id
-INNER JOIN sites AS emp4 ON mission.site = emp4.id;`
+INNER JOIN clients AS emp2 ON mission.client_id = emp2.id;`
 
   db.query(q, (error, data) => {
     if (error) {
@@ -1227,10 +1227,11 @@ exports.getAllPresenceView = (req, res) => {
 exports.postPresence = (req, res)=>{
 
   const { employee_id, client_id, date, check_in_time, check_out_time } = req.body;
+
+
   const q = 'INSERT INTO attendance (employee_id, client_id, date, check_in_time, check_out_time) VALUES (?, ?, ?, ?, ?)';
 
-  
-  db.query(q, [employee_id, client_id, date, check_in_time.time, check_out_time.time],  (error, results) =>{
+  db.query(q, [employee_id, client_id, date, check_in_time, check_out_time],  (error, results) =>{
     if(error){
       console.error("Erreur lors de l'insertion de la présence : ", error);
       res.status(500).json({ error: 'Error inserting attendance' });
@@ -1454,7 +1455,7 @@ exports.getMethodePaiement = (req, res) =>{
 
 exports.getPayementView = (req,res) =>{
   const {id} = req.params;
-  const q =  'SELECT payments.*, emp1.nom AS methode_paiement, emp3.company_name, emp3.address FROM payments INNER JOIN methode_paiement AS emp1 ON payments.payment_method = emp1.id INNER JOIN invoices AS emp2 ON payments.invoice_id = emp2.id INNER JOIN clients AS emp3 ON emp2.client_id = emp3.id where payments.id = ?';
+  const q =  'SELECT payments.*, emp1.nom AS methode_paiement FROM payments INNER JOIN methode_paiement AS emp1 ON payments.payment_method = emp1.id  where payments.id = ?';
       db.query(q,id ,(error, data)=>{
         if(error) res.status(500).send(error)
 
