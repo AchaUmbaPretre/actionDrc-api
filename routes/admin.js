@@ -100,6 +100,8 @@ const {
     deleteSite,
     sitesUpdate,
     getSiteOne,
+    CountPresenceGroup,
+    getPayementTotal,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -195,6 +197,8 @@ router.get('/presence', getPresence)
 router.get('/presenceAll', getAllPresence)
 router.get('/presenceAllView/:id', getAllPresenceView)
 router.get('/presenceCount/:id', countPresence)
+router.get('/presenceCountGroup', CountPresenceGroup)
+/* router.get('/presenceCountMois', CountPresenceGroup) */
 router.post('/presences', postPresence)
 router.delete('/presence/:id', deletePresence)
 router.put('/presencePut/:id', updatePresence)
@@ -213,6 +217,7 @@ router.put('/factureUpdate/:id', updateFacture)
 router.get('/payement', getPayement);
 router.get('/paiementMethode', getMethodePaiement);
 router.get('/payementView/:id', getPayementView);
+router.get('/payementTotal/:id', getPayementTotal);
 router.post('/payementPost', postPayement);
 router.delete('/payement/:id', deletePayement);
 
