@@ -1207,7 +1207,7 @@ exports.getAllPresence = (req, res) => {
   a.date,
   a.check_in_time,
   a.check_out_time,
-  e.id AS emp_id,
+  e.id AS emp1_id,
   e.first_name,
   c.company_name
 FROM
@@ -1247,10 +1247,10 @@ exports.getAllPresenceView = (req, res) => {
   });
 }
 
+
 exports.postPresence = (req, res)=>{
 
   const { employee_id, client_id, date, check_in_time, check_out_time } = req.body;
-
 
   const q = 'INSERT INTO attendance (employee_id, client_id, date, check_in_time, check_out_time) VALUES (?, ?, ?, ?, ?)';
 
