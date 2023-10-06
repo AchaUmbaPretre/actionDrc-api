@@ -197,7 +197,7 @@ router.get('/presence', getPresence)
 router.get('/presenceAll', getAllPresence)
 router.get('/presenceAllView/:id', getAllPresenceView)
 router.get('/presenceCount/:id', countPresence)
-router.get('/presenceCountGroup', CountPresenceGroup)
+router.get('/presenceCountGroup/:', CountPresenceGroup)
 /* router.get('/presenceCountMois', CountPresenceGroup) */
 router.post('/presences', postPresence)
 router.delete('/presence/:id', deletePresence)

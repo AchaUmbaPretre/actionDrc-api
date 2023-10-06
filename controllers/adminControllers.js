@@ -1202,7 +1202,30 @@ exports.getPresence = (req,res) => {
 }
 
 exports.getAllPresence = (req, res) => {
-  const q = "SELECT attendance.id, date, check_in_time, check_out_time, emp1.id AS emp1_id, emp1.first_name, emp2.company_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id";
+  const q = `SELECT
+  a.id,
+  a.date,
+  a.check_in_time,
+  a.check_out_time,
+  e.id AS emp_id,
+  e.first_name,
+  c.company_name
+FROM
+  attendance a
+INNER JOIN
+  employees e ON a.employee_id = e.id
+INNER JOIN
+  clients c ON a.client_id = c.id
+INNER JOIN (
+  SELECT
+    employee_id,
+    MAX(date) AS max_date
+  FROM
+    attendance
+  GROUP BY
+    employee_id
+) sub ON a.employee_id = sub.employee_id AND a.date = sub.max_date;`
+  /* const q = "SELECT attendance.id, date, check_in_time, check_out_time, emp1.id AS emp1_id, emp1.first_name, emp2.company_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id"; */
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
@@ -1214,7 +1237,7 @@ exports.getAllPresence = (req, res) => {
 
 exports.getAllPresenceView = (req, res) => {
   const {id} = req.params;
-  const q = "SELECT attendance.id , date, check_in_time, check_out_time, emp1.first_name, emp2.company_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id  = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id where attendance.id = ?";
+  const q = "SELECT attendance.id , date, check_in_time, check_out_time, emp1.first_name,emp1.id AS employee_id, emp2.company_name, emp2.id AS client_id FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id  = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id where attendance.id = ?";
   db.query(q,id, (error, data) => {
     if (error) {
       return res.status(500).send(error);
@@ -1258,8 +1281,6 @@ exports.countPresence = (req, res) => {
 exports.CountPresenceGroup = (req, res) =>{
 
   const {id} = req.params;
-
-
   const q = `SELECT YEAR(date) AS year, MONTH(date) AS month, COUNT(*) AS presence_count
               FROM attendance
               WHERE employee_id = ?
@@ -1291,11 +1312,14 @@ exports.updatePresence = (req, res) =>{
   const { id } = req.params;
   const {employee_id, client_id, date, check_in_time, check_out_time } = req.body;
 
+  console.log(req.body)
+
   const query = `UPDATE attendance SET employee_id = ?, client_id = ?, date = ?, check_in_time = ?, check_out_time = ? WHERE id = ?`;
   const values = [employee_id, client_id, date, check_in_time, check_out_time, id];
 
   db.query(query, values, (error, result) => {
     if (error) {
+      console.log(error)
       console.error(error);
       res.status(500).json({ error: 'Échec de la mise à jour de presence' });
     } else {
@@ -1452,7 +1476,7 @@ exports.updateFacture = (req, res) =>{
 }
 
 exports.getPayement = (req, res) =>{
-  const q = "SELECT payments.*, emp1.nom AS methode_paiement FROM payments INNER JOIN methode_paiement AS emp1 ON payments.payment_method = emp1.id";
+  const q = "SELECT payments.*, emp1.nom AS methode_paiement, employees.first_name, employees.last_name FROM payments INNER JOIN methode_paiement AS emp1 ON payments.payment_method = emp1.id INNER JOIN employees ON payments.employeId = employees.id ";
    
   db.query(q ,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -1500,7 +1524,8 @@ exports.getPayementTotal = (req,res) =>{
     WHEN MONTH(date) = 11 THEN 'Novembre'
     WHEN MONTH(date) = 12 THEN 'Décembre'
   END AS month, 
-  COUNT(*) AS presence_count, 
+  COUNT(*) AS presence_count,
+  employees.id, 
   employees.first_name,
   employees.last_name,
   (fonction.salaire / 27) * COUNT(*) AS paie
@@ -1526,15 +1551,17 @@ ORDER BY
 }
 
 exports.postPayement = (req, res) => {
-  const { invoice_id, payment_date, amount, payment_method } = req.body;
+  const { employeId, invoice_id, payment_date, amount, payment_method } = req.body;
 
-  const q = 'INSERT INTO payments (invoice_id, payment_date, amount, payment_method) VALUES (?, ?, ?, ?)';
-  const values = [invoice_id, payment_date, amount, payment_method];
+  const q = 'INSERT INTO payments (employeId, invoice_id, payment_date, amount, payment_method) VALUES ( ?, ?, ?, ?, ?)';
+  const values = [employeId, invoice_id, payment_date, amount, payment_method];
 
   db.query(q, values, (err, result) => {
     if (err) {
       console.error('Erreur lors de la création du paiement :', err);
+      console.log(err)
       res.status(500).json({ error: 'Erreur lors de la création du paiement' });
+
     } else {
       const paymentId = result.insertId;
       res.status(200).json({ message: 'Paiement créé avec succès', payment_id: paymentId });
