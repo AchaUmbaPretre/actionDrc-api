@@ -1589,6 +1589,7 @@ exports.updatePaiement = (req, res) =>{
 
   db.query(query, values, (error, result) => {
     if (error) {
+      console.log(error)
       console.error(error);
       res.status(500).json({ error: 'Échec de la mise à jour du paiement' });
     } else {
