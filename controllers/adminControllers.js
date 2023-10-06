@@ -1580,6 +1580,23 @@ exports.deletePayement = (req, res) =>{
   })
 }
 
+exports.updatePaiement = (req, res) =>{
+  const { id } = req.params;
+  const {	client_id, invoice_id, payment_date, amount, payment_method } = req.body;
+
+  const query = `UPDATE payments SET employeId = ?, invoice_date = ?, due_date = ?, total_amount = ?, status = ? WHERE id = ?`;
+  const values = [client_id, invoice_id, payment_date, amount, payment_method, id];
+
+  db.query(query, values, (error, result) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Échec de la mise à jour du paiement' });
+    } else {
+      res.status(200).json({ message: 'Le paiement a ete modifié jour avec succès' });
+    }
+  }) 
+}
+
 exports.getMois = (req, res) => {
 
   const q = "SELECT * FROM mois";

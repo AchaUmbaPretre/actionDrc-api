@@ -102,6 +102,7 @@ const {
     getSiteOne,
     CountPresenceGroup,
     getPayementTotal,
+    updatePaiement,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -220,6 +221,7 @@ router.get('/payementView/:id', getPayementView);
 router.get('/payementTotal/:id', getPayementTotal);
 router.post('/payementPost', postPayement);
 router.delete('/payement/:id', deletePayement);
+router.put('/payementPut/:id', updatePaiement);
 
 router.get('/mois', getMois)
 
