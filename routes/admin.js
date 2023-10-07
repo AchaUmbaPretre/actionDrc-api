@@ -103,6 +103,7 @@ const {
     CountPresenceGroup,
     getPayementTotal,
     updatePaiement,
+    getPresenceOneView,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -196,6 +197,7 @@ router.put('/horaires/:id',putHoraires)
 
 router.get('/presence', getPresence)
 router.get('/presenceAll', getAllPresence)
+router.get('/presenceOneView/:id', getPresenceOneView)
 router.get('/presenceAllView/:id', getAllPresenceView)
 router.get('/presenceCount/:id', countPresence)
 router.get('/presenceCountGroup/:', CountPresenceGroup)

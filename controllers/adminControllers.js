@@ -1235,6 +1235,17 @@ INNER JOIN (
   });
 }
 
+exports.getPresenceOneView = (req,res) => {
+  const {id} = req.params;
+  const q = `SELECT attendance.id, attendance.date, attendance.check_in_time, attendance.check_out_time, emp1.first_name, emp1.last_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id = emp1.id WHERE employee_id = ?`
+   
+  db.query(q ,id, (error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
 exports.getAllPresenceView = (req, res) => {
   const {id} = req.params;
   const q = "SELECT attendance.id , date, check_in_time, check_out_time, emp1.first_name,emp1.id AS employee_id, emp2.company_name, emp2.id AS client_id FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id  = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id where attendance.id = ?";
@@ -1498,7 +1509,7 @@ exports.getMethodePaiement = (req, res) =>{
 
 exports.getPayementView = (req,res) =>{
   const {id} = req.params;
-  const q =  'SELECT payments.*, emp1.nom AS methode_paiement FROM payments INNER JOIN methode_paiement AS emp1 ON payments.payment_method = emp1.id  where payments.id = ?';
+  const q =  'SELECT payments.*, emp1.nom AS methode_paiement, emp2.first_name, emp2.last_name, emp2.address FROM payments INNER JOIN methode_paiement AS emp1 ON payments.payment_method = emp1.id INNER JOIN employees AS emp2 ON payments.employeId = emp2.id where payments.id = ?';
       db.query(q,id ,(error, data)=>{
         if(error) res.status(500).send(error)
 
@@ -1559,7 +1570,6 @@ exports.postPayement = (req, res) => {
   db.query(q, values, (err, result) => {
     if (err) {
       console.error('Erreur lors de la création du paiement :', err);
-      console.log(err)
       res.status(500).json({ error: 'Erreur lors de la création du paiement' });
 
     } else {
@@ -1582,14 +1592,13 @@ exports.deletePayement = (req, res) =>{
 
 exports.updatePaiement = (req, res) =>{
   const { id } = req.params;
-  const {	client_id, invoice_id, payment_date, amount, payment_method } = req.body;
+  const {	employeId, payment_date, amount, payment_method } = req.body;
 
-  const query = `UPDATE payments SET employeId = ?, invoice_date = ?, due_date = ?, total_amount = ?, status = ? WHERE id = ?`;
-  const values = [client_id, invoice_id, payment_date, amount, payment_method, id];
+  const query = `UPDATE payments SET employeId = ?, payment_date = ?, amount = ?, payment_method = ? WHERE id = ?`;
+  const values = [employeId, payment_date, amount, payment_method, id];
 
   db.query(query, values, (error, result) => {
     if (error) {
-      console.log(error)
       console.error(error);
       res.status(500).json({ error: 'Échec de la mise à jour du paiement' });
     } else {
@@ -1604,7 +1613,6 @@ exports.getMois = (req, res) => {
    
   db.query(q ,(error, data)=>{
       if(error) res.status(500).send(error)
-
       return res.status(200).json(data);
   })
 }
