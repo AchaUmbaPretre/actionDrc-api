@@ -120,11 +120,12 @@ exports.postEmploye = (req, res) => {
     ]
 
     db.query(q, [values], (error,data)=>{
-        if(error) res.status(500).json(error)
-        console.log(error)
-
-        return res.json('processus reussi');
-    })
+      if (error) {
+        res.status(500).json(error);
+      } else {
+        return res.json({ message: 'Processus réussi' });
+      }
+    });
 }
 
 exports.deleteEmploye = (req, res) => {
@@ -580,9 +581,7 @@ exports.postClient = (req, res) => {
     if (error) {
       res.status(500).json(error);
     } else {
-      const clientId = result.insertId;
-
-      return res.json({ clientId: clientId, message: 'Processus réussi' });
+      return res.json({ message: 'Processus réussi' });
     }
   });
 };
@@ -677,7 +676,6 @@ exports.updateEmployeFonction = (req, res)=> {
       return res.json(data);
     });
 }
-
 
 
 exports.postAffectation = (req, res) =>{
@@ -1440,15 +1438,22 @@ exports.getAllFactureView = (req, res) => {
 exports.postFacture = async (req, res) => {
   const { client_id, total_amount, status } = req.body;
 
+  const montantInitial = total_amount;
+  const tauxTVA = 0.16;
+
+  const montantTVA = montantInitial * tauxTVA;
+  const montantTotal = montantInitial + montantTVA;
+
   try {
     const montantQuery = 'INSERT INTO invoices (client_id, total_amount, status) VALUES (?, ?, ?)';
 
-    db.query(montantQuery, [client_id, total_amount, status], (error, result) => {
+    db.query(montantQuery, [client_id, montantTotal, status], (error, result) => {
       if (error) {
         console.error("Erreur lors de la création de la facture : ", error);
         res.status(500).json({ error: "Erreur lors de la création de la facture" });
       } else {
         const invoiceId = result.insertId;
+        
         res.json({ invoice_id: invoiceId, message: 'Facture créée avec succès' });
       }
     });
