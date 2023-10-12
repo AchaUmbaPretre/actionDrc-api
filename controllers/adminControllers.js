@@ -1207,6 +1207,7 @@ exports.getAllPresence = (req, res) => {
   a.check_out_time,
   e.id AS emp1_id,
   e.first_name,
+  e.last_name,
   c.company_name
 FROM
   attendance a
@@ -1257,27 +1258,27 @@ exports.getAllPresenceView = (req, res) => {
 }
 
 
-exports.postPresence = (req, res)=>{
-
+exports.postPresence = (req, res) => {
   const { employee_id, client_id, date, check_in_time, check_out_time } = req.body;
 
-  const q = 'INSERT INTO attendance (employee_id, client_id, date, check_in_time, check_out_time) VALUES (?, ?, ?, ?, ?)';
+  const q = 'INSERT INTO attendance (employee_id, client_id, date, check_in_time, check_out_time) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE check_in_time = VALUES(check_in_time), check_out_time = VALUES(check_out_time)';
 
-  db.query(q, [employee_id, client_id, date, check_in_time, check_out_time],  (error, results) =>{
-    if(error){
-      console.error("Erreur lors de l'insertion de la présence : ", error);
+  db.query(q, [employee_id, client_id, date, check_in_time, check_out_time], (error, results) => {
+    if (error) {
+      console.error("Erreur lors de l'insertion de la présence : ", error);
       res.status(500).json({ error: 'Error inserting attendance' });
-    } else  res.json({ message: "Présence enregistrée avec succès" });
-  })
-
-}
+    } else {
+      res.json({ message: "Présence enregistrée avec succès" });
+    }
+  });
+};
 
 exports.countPresence = (req, res) => {
 
   const employeeId = req.params.id;
   const q = 'SELECT COUNT(*) AS attendanceCount FROM attendance WHERE employee_id = ?';
 
-  db.query(q,[employeeId], (error, results) => {
+  db.query(q,employeeId, (error, results) => {
     if (error) {
       console.error('Erreur lors du comptage des présences :', error);
       res.status(500).json({ error: 'Erreur lors du comptage des présences' });
