@@ -1208,7 +1208,34 @@ exports.getAllPresence = (req, res) => {
   e.id AS emp1_id,
   e.first_name,
   e.last_name,
-  c.company_name
+  c.company_name,
+  CASE MONTH(a.date)
+    WHEN 1 THEN 'Janvier'
+    WHEN 2 THEN 'Février'
+    WHEN 3 THEN 'Mars'
+    WHEN 4 THEN 'Avril'
+    WHEN 5 THEN 'Mai'
+    WHEN 6 THEN 'Juin'
+    WHEN 7 THEN 'Juillet'
+    WHEN 8 THEN 'Août'
+    WHEN 9 THEN 'Septembre'
+    WHEN 10 THEN 'Octobre'
+    WHEN 11 THEN 'Novembre'
+    WHEN 12 THEN 'Décembre'
+  END AS month_name,
+  CASE
+    WHEN a.check_in_time IS NOT NULL AND a.check_out_time IS NOT NULL THEN 'Présent'
+    ELSE 'Absent'
+  END AS presence_status,
+  COUNT(DISTINCT DATE(a.date)) AS total_days,
+  (
+    SELECT COUNT(*)
+    FROM attendance att
+    WHERE att.employee_id = a.employee_id
+    AND MONTH(att.date) = MONTH(CURRENT_DATE)
+    AND att.check_in_time IS NOT NULL
+    AND att.check_out_time IS NOT NULL
+  ) AS total_presence
 FROM
   attendance a
 INNER JOIN
@@ -1221,9 +1248,24 @@ INNER JOIN (
     MAX(date) AS max_date
   FROM
     attendance
+  WHERE
+    MONTH(date) = MONTH(CURRENT_DATE)
   GROUP BY
     employee_id
-) sub ON a.employee_id = sub.employee_id AND a.date = sub.max_date;`
+) sub ON a.employee_id = sub.employee_id AND a.date = sub.max_date
+WHERE
+  MONTH(a.date) = MONTH(CURRENT_DATE)
+GROUP BY
+  a.id,
+  a.date,
+  a.check_in_time,
+  a.check_out_time,
+  e.id,
+  e.first_name,
+  e.last_name,
+  c.company_name,
+  month_name,
+  presence_status`
   /* const q = "SELECT attendance.id, date, check_in_time, check_out_time, emp1.id AS emp1_id, emp1.first_name, emp2.company_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id"; */
   db.query(q, (error, data) => {
     if (error) {
@@ -1236,7 +1278,32 @@ INNER JOIN (
 
 exports.getPresenceOneView = (req,res) => {
   const {id} = req.params;
-  const q = `SELECT attendance.id, attendance.date, attendance.check_in_time, attendance.check_out_time, emp1.first_name, emp1.last_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id = emp1.id WHERE employee_id = ?`
+  const q = `SELECT
+  attendance.id,
+  attendance.date,
+  attendance.check_in_time,
+  attendance.check_out_time,
+  emp1.first_name,
+  emp1.last_name,
+  CASE
+    WHEN attendance.check_in_time IS NOT NULL AND attendance.check_out_time IS NOT NULL THEN 'Présent'
+    ELSE 'Absent'
+  END AS presence_status,
+  COUNT(*) AS presence_count
+FROM
+  attendance
+INNER JOIN
+  employees AS emp1 ON attendance.employee_id = emp1.id
+WHERE
+  attendance.employee_id = ?
+GROUP BY
+  attendance.id,
+  attendance.date,
+  attendance.check_in_time,
+  attendance.check_out_time,
+  emp1.first_name,
+  emp1.last_name,
+  presence_status`
    
   db.query(q ,id, (error, data)=>{
       if(error) res.status(500).send(error)
@@ -1253,6 +1320,34 @@ exports.getAllPresenceView = (req, res) => {
       return res.status(500).send(error);
     }
     
+    return res.status(200).json(data);
+  });
+}
+
+exports.getAllPresenceViewCounter = (req, res) => {
+  const { month, AgentId } = req.query;
+  const q = `
+    SELECT
+      emp1.first_name,
+      emp1.last_name,
+      SUM(CASE
+        WHEN attendance.check_in_time IS NOT NULL AND attendance.check_out_time IS NOT NULL THEN 1
+        ELSE 0
+      END) AS total_jours
+    FROM
+      attendance
+    INNER JOIN
+      employees AS emp1 ON attendance.employee_id = emp1.id
+    WHERE
+      attendance.employee_id = ? AND MONTH(attendance.date) = ?
+    GROUP BY
+      emp1.first_name,
+      emp1.last_name
+  `;
+  db.query(q, [AgentId, month], (error, data) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
     return res.status(200).json(data);
   });
 }
@@ -1321,8 +1416,6 @@ exports.deletePresence = (req, res) =>{
 exports.updatePresence = (req, res) =>{
   const { id } = req.params;
   const {employee_id, client_id, date, check_in_time, check_out_time } = req.body;
-
-  console.log(req.body)
 
   const query = `UPDATE attendance SET employee_id = ?, client_id = ?, date = ?, check_in_time = ?, check_out_time = ? WHERE id = ?`;
   const values = [employee_id, client_id, date, check_in_time, check_out_time, id];
