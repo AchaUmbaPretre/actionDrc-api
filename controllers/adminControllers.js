@@ -16,7 +16,7 @@ exports.getEmploye = (req, res) => {
 };
 
 exports.getEmployeCount = (req, res) => {
-  const q = "SELECT count(*) as total FROM employees";
+  const q = "SELECT COUNT(*) AS total FROM employees WHERE est_supprime = 0;";
 
   db.query(q ,(error, data)=>{
     if(error) res.status(500).send(error)
@@ -123,7 +123,7 @@ exports.postEmploye = (req, res) => {
       if (error) {
         res.status(500).json(error);
       } else {
-        return res.json({ message: 'Processus réussi' });
+        return res.json({ message: 'Processus réussi'});
       }
     });
 }
@@ -1618,9 +1618,9 @@ exports.getPayementView = (req,res) =>{
 
 exports.getPayementTotal = (req,res) =>{
   const {id} = req.params;
-  const q =  `SELECT 
-  YEAR(date) AS year, 
-  CASE 
+  const q =  `SELECT
+  YEAR(date) AS year,
+  CASE
     WHEN MONTH(date) = 1 THEN 'Janvier'
     WHEN MONTH(date) = 2 THEN 'Février'
     WHEN MONTH(date) = 3 THEN 'Mars'
@@ -1633,32 +1633,84 @@ exports.getPayementTotal = (req,res) =>{
     WHEN MONTH(date) = 10 THEN 'Octobre'
     WHEN MONTH(date) = 11 THEN 'Novembre'
     WHEN MONTH(date) = 12 THEN 'Décembre'
-  END AS month, 
+  END AS month,
   COUNT(*) AS presence_count,
-  employees.id, 
+  employees.id,
   employees.first_name,
   employees.last_name,
   (fonction.salaire / 27) * COUNT(*) AS paie
-FROM 
-  attendance 
-INNER JOIN 
-  employees ON attendance.employee_id = employees.id 
-INNER JOIN 
-  contrats ON employees.contrat_id = contrats.id 
-LEFT JOIN 
-  fonction ON contrats.id = fonction.contrat_id 
-WHERE 
-  attendance.employee_id = ? 
-GROUP BY 
+FROM
+  attendance
+INNER JOIN
+  employees ON attendance.employee_id = employees.id
+INNER JOIN
+  contrats ON employees.contrat_id = contrats.id
+LEFT JOIN
+  fonction ON contrats.id = fonction.contrat_id
+WHERE
+  attendance.employee_id = ?
+  AND YEAR(date) = YEAR(CURRENT_DATE())
+  AND MONTH(date) = MONTH(CURRENT_DATE())
+GROUP BY
   YEAR(date), MONTH(date)
-ORDER BY 
-  YEAR(date), MONTH(date);`
+ORDER BY
+  YEAR(date), MONTH(date)`
       db.query(q,id ,(error, data)=>{
         if(error) res.status(500).send(error)
 
       return res.status(200).json(data);
       })
 }
+
+exports.getPayementTotalSelect = (req,res) =>{
+  const employeeId = req.params.employeeId;
+  const month = req.params.month;
+
+  const q =  `SELECT
+  YEAR(date) AS year,
+  CASE
+    WHEN MONTH(date) = 1 THEN 'Janvier'
+    WHEN MONTH(date) = 2 THEN 'Février'
+    WHEN MONTH(date) = 3 THEN 'Mars'
+    WHEN MONTH(date) = 4 THEN 'Avril'
+    WHEN MONTH(date) = 5 THEN 'Mai'
+    WHEN MONTH(date) = 6 THEN 'Juin'
+    WHEN MONTH(date) = 7 THEN 'Juillet'
+    WHEN MONTH(date) = 8 THEN 'Août'
+    WHEN MONTH(date) = 9 THEN 'Septembre'
+    WHEN MONTH(date) = 10 THEN 'Octobre'
+    WHEN MONTH(date) = 11 THEN 'Novembre'
+    WHEN MONTH(date) = 12 THEN 'Décembre'
+  END AS month,
+  COUNT(*) AS presence_count,
+  employees.id,
+  employees.first_name,
+  employees.last_name,
+  (fonction.salaire / 27) * COUNT(*) AS paie
+FROM
+  attendance
+INNER JOIN
+  employees ON attendance.employee_id = employees.id
+INNER JOIN
+  contrats ON employees.contrat_id = contrats.id
+LEFT JOIN
+  fonction ON contrats.id = fonction.contrat_id
+WHERE
+  attendance.employee_id = ?
+  AND YEAR(date) = YEAR(CURRENT_DATE())
+  AND MONTH(date) = ?
+GROUP BY
+  YEAR(date), MONTH(date)
+ORDER BY
+  YEAR(date), MONTH(date)`
+      db.query(q ,[employeeId, month] ,(error, data)=>{
+        if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+      })
+} 
+
+
 
 exports.postPayement = (req, res) => {
   const { employeId, invoice_id, payment_date, amount, payment_method } = req.body;
@@ -1677,6 +1729,8 @@ exports.postPayement = (req, res) => {
     }
   });
 };
+
+
 
 exports.deletePayement = (req, res) =>{
 

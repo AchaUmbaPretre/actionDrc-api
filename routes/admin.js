@@ -105,6 +105,7 @@ const {
     updatePaiement,
     getPresenceOneView,
     getAllPresenceViewCounter,
+    getPayementTotalSelect,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -223,6 +224,7 @@ router.get('/payement', getPayement);
 router.get('/paiementMethode', getMethodePaiement);
 router.get('/payementView/:id', getPayementView);
 router.get('/payementTotal/:id', getPayementTotal);
+router.get('/payementTotalSelect/:employeeId/:month', getPayementTotalSelect);
 router.post('/payementPost', postPayement);
 router.delete('/payement/:id', deletePayement);
 router.put('/payementPut/:id', updatePaiement);
