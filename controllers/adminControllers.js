@@ -716,6 +716,8 @@ exports.getAffectation = (req,res) =>{
     })
 }
 
+/* SELECT affectations.id, emp1.first_name, emp1.last_name, emp1.skills, fonction_client.contrat_id, fonction_client.avantages, fonction_client.salaire, fonction_client.prix, contrats.end_date, contrats.contract_type, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction_client ON affectations.fonction_clientId = fonction_client.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id WHERE affectations.id = 114;
+ */
 exports.getAffectationUn = (req,res) =>{
   const {id} = req.params;
   const q = "SELECT * FROM affectations where id = ?";
@@ -1532,22 +1534,18 @@ exports.getAllFactureView = (req, res) => {
 exports.postFacture = async (req, res) => {
   const { client_id, total_amount, status } = req.body;
 
-  const montantInitial = total_amount;
-  const tauxTVA = 0.16;
+  const montantInitial = parseInt(total_amount);
 
-  const montantTVA = montantInitial * tauxTVA;
-  const montantTotal = montantInitial + montantTVA;
 
   try {
     const montantQuery = 'INSERT INTO invoices (client_id, total_amount, status) VALUES (?, ?, ?)';
 
-    db.query(montantQuery, [client_id, montantTotal, status], (error, result) => {
+    db.query(montantQuery, [client_id, montantInitial, status], (error, result) => {
       if (error) {
         console.error("Erreur lors de la création de la facture : ", error);
         res.status(500).json({ error: "Erreur lors de la création de la facture" });
       } else {
         const invoiceId = result.insertId;
-        
         res.json({ invoice_id: invoiceId, message: 'Facture créée avec succès' });
       }
     });
@@ -1761,9 +1759,7 @@ exports.updatePaiement = (req, res) =>{
 }
 
 exports.getMois = (req, res) => {
-
   const q = "SELECT * FROM mois";
-   
   db.query(q ,(error, data)=>{
       if(error) res.status(500).send(error)
       return res.status(200).json(data);
