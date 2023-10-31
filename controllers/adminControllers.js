@@ -740,7 +740,7 @@ exports.getAffectationCount = (req, res) => {
 }
 
 exports.getAllAffectation = (req, res) => {
-  const q = "SELECT affectations.id,affectations.created_at, emp1.first_name, emp1.last_name, emp1.skills, fonction.contrat_id, fonction.avantages, fonction.salaire, fonction.prix, contrats.end_date, contrats.	contract_type, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction ON affectations.fonction_id = fonction.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id";
+  const q = "SELECT affectations.id,affectations.created_at, emp1.id AS userId, emp1.first_name, emp1.last_name, emp1.skills, fonction.contrat_id, fonction.avantages, fonction.salaire, fonction.prix, contrats.end_date, contrats.	contract_type, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction ON affectations.fonction_id = fonction.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id";
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
@@ -795,6 +795,20 @@ exports.affectationUpdate = (req, res) => {
     }
 
     return res.status(200).json({ message: "Affectation updated successfully" });
+  });
+};
+
+exports.affectationPutAgent = (req, res) => {
+  const { id } = req.params;
+  const query = 'UPDATE employees SET contrat_id = NULL WHERE id = ?';
+
+  db.query(query, [id], (error, results) => {
+    if (error) {
+      console.error('Erreur lors de la mise à jour de contrat_id:', error);
+      res.status(500).json({ error: 'Une erreur s\'est produite lors de la mise à jour de contrat_id' });
+    } else {
+      res.status(200).json({ message: 'contrat_id mis à jour avec succès' });
+    }
   });
 };
 
@@ -978,14 +992,9 @@ exports.getContratAff = (req, res)=>{
 }
 
 exports.postMission = (req, res) => {
-  const q =
-    'INSERT INTO mission (`agent_id`, `client_id`, `heureEntrant`, `heureSortant`, `jour`,`site`) VALUES (?, ?, ?, ?, ?, ?)';
-
-/*   const dateEntrant = moment(req.body.dateEntrant, 'YYYY-MM-DD');
-  const dateSortant = moment(req.body.dateSortant, 'YYYY-MM-DD'); */
-
-/*   const duree = Math.ceil(dateSortant.diff(dateEntrant, 'months')) */;
-
+  const selectQuery = 'SELECT * FROM mission WHERE agent_id = ? AND jour = ?';
+  const insertQuery = 'INSERT INTO mission (`agent_id`, `client_id`, `heureEntrant`, `heureSortant`, `jour`, `site`) VALUES (?, ?, ?, ?, ?, ?)';
+  
   const values = [
     req.body.agent_id,
     req.body.client_id,
@@ -994,12 +1003,24 @@ exports.postMission = (req, res) => {
     req.body.jour,
     req.body.site
   ];
-  db.query(q, values, (error, data) => {
+
+  db.query(selectQuery, [req.body.agent_id, req.body.jour], (error, results) => {
     if (error) {
       res.status(500).json(error);
-      console.log(error)
+      console.log(error);
     } else {
-      res.json('Processus réussi');
+      if (results.length > 0) {
+        res.status(400).json({ message: 'Cet agent a déjà des données pour ce jour.' });
+      } else {
+        db.query(insertQuery, values, (error, data) => {
+          if (error) {
+            res.status(500).json(error);
+            console.log(error);
+          } else {
+            res.json('Processus réussi');
+          }
+        });
+      }
     }
   });
 };
@@ -1371,7 +1392,6 @@ exports.postPresence = (req, res) => {
 };
 
 exports.countPresence = (req, res) => {
-
   const employeeId = req.params.id;
   const q = 'SELECT COUNT(*) AS attendanceCount FROM attendance WHERE employee_id = ?';
 
@@ -1383,8 +1403,8 @@ exports.countPresence = (req, res) => {
       res.json(results);
     }
   })
-
 }
+
 exports.CountPresenceGroup = (req, res) =>{
 
   const {id} = req.params;
@@ -1405,7 +1425,6 @@ exports.CountPresenceGroup = (req, res) =>{
 }
 
 exports.deletePresence = (req, res) =>{
-
   const clientId = req.params.id;
   const q = "DELETE FROM attendance WHERE id = ?"
 
@@ -1720,7 +1739,6 @@ exports.postPayement = (req, res) => {
     if (err) {
       console.error('Erreur lors de la création du paiement :', err);
       res.status(500).json({ error: 'Erreur lors de la création du paiement' });
-
     } else {
       const paymentId = result.insertId;
       res.status(200).json({ message: 'Paiement créé avec succès', payment_id: paymentId });

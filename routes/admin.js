@@ -106,6 +106,7 @@ const {
     getPresenceOneView,
     getAllPresenceViewCounter,
     getPayementTotalSelect,
+    affectationPutAgent,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -167,6 +168,7 @@ router.get('/affectation/:id', getAffectationUn)
 router.get('/affectations/:id', getAllAffectationOne)
 router.get('/allaffectation', getAllAffectation)
 router.delete('/deleteAff/:id', deleteAffectation)
+router.put('/affectationPutAgent/:id', affectationPutAgent)
 router.put('/affectationPut/:id', affectationUpdate)
 
 router.get('/mission', getMission)
