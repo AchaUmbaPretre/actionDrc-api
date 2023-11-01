@@ -1453,7 +1453,7 @@ exports.updatePresence = (req, res) =>{
 }
 
 
-exports.postRapportPresence = (req, res) => {
+exports.getRapportPresence = (req, res) => {
   const { startDate, endDate, employee_id } = req.body; // Récupérer startDate, endDate et employee_id depuis la requête POST
 
   const q = `SELECT
