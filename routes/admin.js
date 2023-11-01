@@ -107,6 +107,7 @@ const {
     getAllPresenceViewCounter,
     getPayementTotalSelect,
     affectationPutAgent,
+    postRapportPresence,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -210,6 +211,8 @@ router.get('/presenceCountGroup/:id', CountPresenceGroup)
 router.post('/presences', postPresence)
 router.delete('/presence/:id', deletePresence)
 router.put('/presencePut/:id', updatePresence)
+
+router.post('/rapportPresence', postRapportPresence)
 
 router.get('/statusFacture', getMontantStatus);
 router.get('/facture', getFacture);

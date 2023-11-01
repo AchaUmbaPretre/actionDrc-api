@@ -1453,6 +1453,78 @@ exports.updatePresence = (req, res) =>{
 }
 
 
+exports.postRapportPresence = (req, res) => {
+  const { startDate, endDate, employee_id } = req.body; // Récupérer startDate, endDate et employee_id depuis la requête POST
+
+  const q = `SELECT
+  a.id,
+  a.date,
+  a.check_in_time,
+  a.check_out_time,
+  e.id AS emp1_id,
+  e.first_name,
+  e.last_name,
+  c.company_name,
+  CASE MONTH(a.date)
+      WHEN 1 THEN 'Janvier'
+      WHEN 2 THEN 'Février'
+      WHEN 3 THEN 'Mars'
+      WHEN 4 THEN 'Avril'
+      WHEN 5 THEN 'Mai'
+      WHEN 6 THEN 'Juin'
+      WHEN 7 THEN 'Juillet'
+      WHEN 8 THEN 'Août'
+      WHEN 9 THEN 'Septembre'
+      WHEN 10 THEN 'Octobre'
+      WHEN 11 THEN 'Novembre'
+      WHEN 12 THEN 'Décembre'
+  END AS month_name,
+  CASE
+      WHEN a.check_in_time IS NOT NULL AND a.check_out_time IS NOT NULL THEN 'Présent'
+      ELSE 'Absent'
+  END AS presence_status,
+  COUNT(DISTINCT DATE(a.date)) AS total_days,
+  (
+      SELECT COUNT(*)
+      FROM attendance att
+      WHERE att.employee_id = a.employee_id
+          AND att.date >= '2023-01-01'
+          AND att.date <= '2023-10-31'
+          AND att.check_in_time IS NOT NULL
+          AND att.check_out_time IS NOT NULL
+  ) AS total_presence
+FROM attendance a
+INNER JOIN employees e ON a.employee_id = e.id
+INNER JOIN clients c ON a.client_id = c.id
+WHERE
+  a.date >= ?
+  AND a.date <= ?
+  AND a.employee_id = ?
+GROUP BY
+  a.id,
+  a.date,
+  a.check_in_time,
+  a.check_out_time,
+  e.id,
+  e.first_name,
+  e.last_name,
+  c.company_name,
+  month_name,
+  presence_status
+ORDER BY
+  a.date ASC;`
+
+  db.query(q, [startDate, endDate, employee_id], (error, data) => {
+    if (error) {
+      console.log(error)
+      return res.status(500).send(error);
+    }
+
+    return res.status(200).json(data);
+  });
+}
+
+
 exports.getFacture = (req, res) => {
   const q = "SELECT * FROM invoices";
    
