@@ -212,7 +212,7 @@ router.post('/presences', postPresence)
 router.delete('/presence/:id', deletePresence)
 router.put('/presencePut/:id', updatePresence)
 
-router.post('/rapportPresence', getRapportPresence)
+router.get('/rapportPresence', getRapportPresence)
 
 router.get('/statusFacture', getMontantStatus);
 router.get('/facture', getFacture);

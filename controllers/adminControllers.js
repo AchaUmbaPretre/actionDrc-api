@@ -1454,7 +1454,7 @@ exports.updatePresence = (req, res) =>{
 
 
 exports.getRapportPresence = (req, res) => {
-  const { startDate, endDate, employee_id } = req.body; // Récupérer startDate, endDate et employee_id depuis la requête POST
+  const { startDate, endDate, employee_id } = req.query;
 
   const q = `SELECT
   a.id,
@@ -1488,10 +1488,8 @@ exports.getRapportPresence = (req, res) => {
       SELECT COUNT(*)
       FROM attendance att
       WHERE att.employee_id = a.employee_id
-          AND att.date >= '2023-01-01'
-          AND att.date <= '2023-10-31'
-          AND att.check_in_time IS NOT NULL
-          AND att.check_out_time IS NOT NULL
+          AND att.date >= ?
+          AND att.date <= ?
   ) AS total_presence
 FROM attendance a
 INNER JOIN employees e ON a.employee_id = e.id
@@ -1514,12 +1512,11 @@ GROUP BY
 ORDER BY
   a.date ASC;`
 
-  db.query(q, [startDate, endDate, employee_id], (error, data) => {
+  db.query(q, [startDate, endDate, startDate, endDate, employee_id], (error, data) => {
     if (error) {
       console.log(error)
       return res.status(500).send(error);
     }
-
     return res.status(200).json(data);
   });
 }
