@@ -25,29 +25,6 @@ exports.getEmployeCount = (req, res) => {
 })
 }
 
-/* export const getAllEmploye = (req, res) => {
-  const q = "SELECT *, emp1.nom_type, competences.nom, niveauetude.titre, status.nom_status FROM employees INNER JOIN type_piece AS emp1 ON employees.identification_type = emp1.id INNER JOIN competences ON employees.skills = competences.id INNER JOIN niveauetude ON employees.certifications = niveauetude.id INNER JOIN status ON employees.employment_status = status.id";
-  
-  db.query(q, (error, data) => {
-    if (error) {
-      console.error('Erreur lors de la récupération des employés :', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des employés' });
-    }
-    return res.status(200).json(data);
-  });
-} */
-
-/* export const getAllEmployeeView = (req, res) => {
-  const q = "SELECT *,employees.id, emp1.nom_type, competences.nom, niveauetude.titre, status.nom_status FROM employees INNER JOIN type_piece AS emp1 ON employees.identification_type = emp1.id INNER JOIN competences ON employees.skills = competences.id INNER JOIN niveauetude ON employees.certifications = niveauetude.id INNER JOIN status ON employees.employment_status = status.id where employees.id = ?";
-  
-  db.query(q, (error, data) => {
-    if (error) {
-      console.error('Erreur lors de la récupération des employés :', error);
-      return res.status(500).json({ error: 'Erreur lors de la récupération des employés' });
-    }
-    return res.status(200).json(data);
-  });
-} */
 exports.getEmployeJoin = (req, res) => {
   const q = "SELECT employees.*, affectations.emploie_id AS nom_emploi FROM employees JOIN affectations ON employees.id = affectations.employee_id";
   
@@ -60,22 +37,6 @@ exports.getEmployeJoin = (req, res) => {
     }
   });
 };
-
-/* SELECT Emploi.*, Compagnie.nom AS nom_compagnie
-FROM Emploi
-JOIN Compagnie ON Emploi.id_compagnie = Compagnie.id
-WHERE Emploi.id = <id_emploi></id_emploi> */
-
-
-/* export const viewsEmploye = (req, res) =>{
-    const {id} = req.params;
-    const q = "SELECT * FROM employees where id = ?";
-
-    db.query(q, id, (error, data)=>{
-        if(error) res.status(500).send(error)
-        return res.status(200).json(data);
-    })
-} */
 
 exports.viewsEmploye = (req, res) => {
   const { id } = req.params;
@@ -165,6 +126,41 @@ exports.updateEmploye = (req, res)=> {
       });
 }
 
+exports.getDepartement = (req, res) =>{
+  const q = "SELECT * FROM departement";
+     
+  db.query(q ,(error, data)=>{
+      if(error) res.status(500).send(error)
+
+      return res.status(200).json(data);
+  })
+}
+
+exports.postDepartement = (req, res) => {
+  const q = 'INSERT INTO departement (`nom_departement`) VALUES (?)';
+
+  const { nom_departement } = req.body;
+
+  db.query(q, [nom_departement], (error, data) => {
+    if (error) {
+      res.status(500).json(error);
+      console.log(error);
+    } else {
+      res.json('Processus réussi');
+    }
+  });
+};
+
+exports.deleteDepartement = (req, res) =>{
+  const {id} = req.params;
+  const q = "DELETE FROM departement WHERE id = ?"
+
+  db.query(q, [id], (err, data)=>{
+      if (err) return res.send(err);
+    return res.json(data);
+  })
+}
+
 exports.getCompetence = (req, res) =>{
   const q = "SELECT * FROM competences";
      
@@ -214,17 +210,6 @@ exports.getContrat = (req, res) =>{
         return res.status(200).json(data);
     })
 }
-
-/* export const getAllContrat = (req, res) => {
-  const q = "SELECT contrats.*, emp1.company_name FROM contrats INNER JOIN clients AS emp1 ON contrats.client_id = emp1.id";
-  db.query(q, (error, data) => {
-    if (error) {
-      return res.status(500).send(error);
-    }
-    
-    return res.status(200).json(data);
-  });
-} */
 
 exports.getAllContrat = (req, res) => {
   const q = "SELECT contrats.*, emp1.company_name FROM contrats INNER JOIN clients AS emp1 ON contrats.client_id = emp1.id";
@@ -1412,6 +1397,7 @@ exports.CountPresenceGroup = (req, res) =>{
               FROM attendance
               WHERE employee_id = ?
               GROUP BY YEAR(date), MONTH(date)
+ 
               ORDER BY YEAR(date), MONTH(date);`
 
         db.query(q, id,(error, data) => {
@@ -1452,10 +1438,8 @@ exports.updatePresence = (req, res) =>{
   }) 
 }
 
-
 exports.getRapportPresence = (req, res) => {
   const { startDate, endDate, employee_id } = req.query;
-
   const q = `SELECT
   a.id,
   a.date,

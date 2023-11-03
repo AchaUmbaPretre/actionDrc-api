@@ -108,6 +108,9 @@ const {
     getPayementTotalSelect,
     affectationPutAgent,
     getRapportPresence,
+    getDepartement,
+    postDepartement,
+    deleteDepartement,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
@@ -117,6 +120,10 @@ router.get('/count', getEmployeCount)
 router.post('/employe', postEmploye)
 router.put('/employes/:id', deleteEmploye)
 router.put('/employe/:id', updateEmploye)
+
+router.get('/departement', getDepartement)
+router.post('/departement', postDepartement)
+router.delete('/departement/:id', deleteDepartement)
 
 router.get('/competence', getCompetence)
 router.get('/niveau', getNiveau)
