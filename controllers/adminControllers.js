@@ -136,6 +136,20 @@ exports.getDepartement = (req, res) =>{
   })
 }
 
+exports.viewsDepartement = (req, res) =>{
+  const {id} = req.params;
+
+  const q = "SELECT nom_departement FROM departement  WHERE id = ?";
+
+  db.query(q, id, (error, data) => {
+      if (error) {
+          return res.status(500).send(error);
+      }
+      return res.status(200).json(data);
+  });
+     
+}
+
 exports.postDepartement = (req, res) => {
   const q = 'INSERT INTO departement (`nom_departement`) VALUES (?)';
 
@@ -160,6 +174,19 @@ exports.deleteDepartement = (req, res) =>{
     return res.json(data);
   })
 }
+
+exports.updateDepartement = (req, res) => {
+  const { id } = req.params;
+  const { nom_departement } = req.body;
+  const q = "UPDATE departement SET `nom_departement` = ? WHERE id = ?";
+
+  db.query(q, [nom_departement, id], (err, data) => {
+    if (err) {
+      return res.status(500).json(err);
+    }
+    return res.json(data);
+  });
+};
 
 exports.getCompetence = (req, res) =>{
   const q = "SELECT * FROM competences";
