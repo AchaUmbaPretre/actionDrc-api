@@ -1311,41 +1311,55 @@ GROUP BY
   });
 }
 
-exports.getPresenceOneView = (req,res) => {
-  const {id} = req.params;
+exports.getPresenceOneView = (req, res) => {
+  const { id } = req.params;
   const q = `SELECT
-  attendance.id,
-  attendance.date,
-  attendance.check_in_time,
-  attendance.check_out_time,
-  emp1.first_name,
-  emp1.last_name,
-  CASE
-    WHEN attendance.check_in_time IS NOT NULL AND attendance.check_out_time IS NOT NULL THEN 'Présent'
-    ELSE 'Absent'
-  END AS presence_status,
-  COUNT(*) AS presence_count
-FROM
-  attendance
-INNER JOIN
-  employees AS emp1 ON attendance.employee_id = emp1.id
-WHERE
-  attendance.employee_id = ?
-GROUP BY
-  attendance.id,
-  attendance.date,
-  attendance.check_in_time,
-  attendance.check_out_time,
-  emp1.first_name,
-  emp1.last_name,
-  presence_status`
-   
-  db.query(q ,id, (error, data)=>{
-      if(error) res.status(500).send(error)
+    attendance.id,
+    attendance.date,
+    attendance.check_in_time,
+    attendance.check_out_time,
+    emp1.first_name,
+    emp1.last_name,
+    CASE
+      WHEN attendance.check_in_time IS NOT NULL AND attendance.check_out_time IS NOT NULL THEN 'Présent'
+      ELSE 'Absent'
+    END AS presence_status,
+    COUNT(*) AS presence_count
+  FROM
+    attendance
+  INNER JOIN
+    employees AS emp1 ON attendance.employee_id = emp1.id
+  WHERE
+    attendance.employee_id = ?
+  GROUP BY
+    attendance.id,
+    attendance.date,
+    attendance.check_in_time,
+    attendance.check_out_time,
+    emp1.first_name,
+    emp1.last_name,
+    presence_status`;
 
-      return res.status(200).json(data);
-  })
-}
+  db.query(q, id, (error, data) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+
+    // Ajouter le jour de la semaine à chaque enregistrement
+    const result = data.map((record) => {
+      const date = new Date(record.date);
+      const dayOfWeek = date.toLocaleString('fr-FR', { weekday: 'long' });
+      const capitalizedDayOfWeek = dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1);
+
+      return {
+        ...record,
+        dayOfWeek: capitalizedDayOfWeek
+      };
+    });
+
+    return res.status(200).json(result);
+  });
+};
 
 exports.getAllPresenceView = (req, res) => {
   const {id} = req.params;
@@ -1554,7 +1568,7 @@ exports.getMontantStatus = (req, res) => {
 }
 
 exports.getAllFacture = (req, res) => {
-  const q = "SELECT invoices.id, invoice_date, due_date, total_amount,status , emp2.company_name FROM invoices INNER JOIN clients AS emp2 ON invoices.client_id = emp2.id";
+  const q = "SELECT invoices.id, invoice_date, created_at, due_date, total_amount,status , emp2.company_name FROM invoices INNER JOIN clients AS emp2 ON invoices.client_id = emp2.id";
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
