@@ -16,7 +16,7 @@ exports.getEmploye = (req, res) => {
 };
 
 exports.getEmployeCount = (req, res) => {
-  const q = "SELECT COUNT(*) AS total FROM employees WHERE est_supprime = 0;";
+  const q = "SELECT COUNT(*) AS total FROM employees WHERE est_supprime = 0";
 
   db.query(q ,(error, data)=>{
     if(error) res.status(500).send(error)
@@ -230,7 +230,7 @@ exports.getStatus = (req, res) =>{
 }
 
 exports.getContrat = (req, res) =>{
-    const q = "SELECT * FROM contrats";
+    const q = "SELECT * FROM contrats WHERE est_supprime = 0";
      
     db.query(q ,(error, data)=>{
         if(error) res.status(500).send(error)
@@ -240,7 +240,7 @@ exports.getContrat = (req, res) =>{
 }
 
 exports.getAllContrat = (req, res) => {
-  const q = "SELECT contrats.*, emp1.company_name FROM contrats INNER JOIN clients AS emp1 ON contrats.client_id = emp1.id";
+  const q = "SELECT contrats.*, emp1.company_name FROM contrats INNER JOIN clients AS emp1 ON contrats.client_id = emp1.id WHERE est_supprime = 0";
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
@@ -265,7 +265,7 @@ exports.getAllContrat = (req, res) => {
 }
 
 exports.getContratCount = (req, res) => {
-  const q = "SELECT count(*) as total FROM contrats";
+  const q = "SELECT count(*) as total FROM contrats WHERE est_supprime = 0";
 
   db.query(q ,(error, data)=>{
     if(error) res.status(500).send(error)
@@ -496,7 +496,7 @@ exports.postContratInfo = (req, res) => {
 
 exports.deleteContrat = (req, res) =>{
     const employeId = req.params.id;
-    const q = "DELETE FROM contrats WHERE id = ?"
+    const q = "UPDATE contrats SET est_supprime = 1 WHERE id = ?";
 
     db.query(q, [employeId], (err, data)=>{
         if (err) return res.send(err);

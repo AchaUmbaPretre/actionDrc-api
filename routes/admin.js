@@ -146,7 +146,7 @@ router.get('/contratTitle/:id', getcontratTitle)
 router.post('/contrat', postContrat)
 router.post('/contratEmploie', postContratEmploie)
 router.post('/ContratInfo', postContratInfo)
-router.delete('/contrat/:id', deleteContrat)
+router.put('/contrats/:id', deleteContrat)
 router.put('/contrat/:id', updateContrat)
 
 router.get('/contratInfo', getContratInfosAll)
