@@ -1,14 +1,16 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 const authRoute = require('./routes/auth');
 const adminRoute = require('./routes/admin');
 const usersRoute = require('./routes/users');
-const multer = require('multer');
 
 const app = express();
 
 app.use(cors());
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -16,20 +18,20 @@ app.use('/api/auth', authRoute);
 app.use('/api/admin', adminRoute);
 app.use('/api/users', usersRoute);
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, '../admin-drc/public/upload');
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
-  },
-});
+app.post('/api/upload', (req, res) => {
+  const { imageBase64 } = req.body;
 
-const upload = multer({ storage });
+  const base64Data = imageBase64.replace(/^data:image\/png;base64,/, '');
+  const fileName = Date.now() + '.png';
 
-app.post('/api/upload', upload.single('file'), (req, res) => {
-  const file = req.file;
-  res.status(200).json(file.filename);
+  require('fs').writeFile(`../admin-drc/public/upload/${fileName}`, base64Data, 'base64', function (err) {
+    if (err) {
+      console.log(err);
+      res.status(500).json({ success: false, message: 'Erreur lors de l\'enregistrement de l\'image' });
+    } else {
+      res.status(200).json({ success: true, message: 'Image enregistrée avec succès' });
+    }
+  });
 });
 
 app.listen(8080, () => {

@@ -82,6 +82,7 @@ exports.postEmploye = (req, res) => {
 
     db.query(q, [values], (error,data)=>{
       if (error) {
+        console.log(error)
         res.status(500).json(error);
       } else {
         return res.json({ message: 'Processus réussi'});
