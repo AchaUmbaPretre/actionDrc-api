@@ -201,7 +201,7 @@ router.get('/sites', getSiteAll)
 router.get('/sitesOne/:id', getSiteOne)
 router.get('/sites/:id', getSite)
 router.post('/sites',postSites)
-router.delete('/siteDelete/:id',deleteSite)
+router.put('/siteDelete/:id',deleteSite)
 router.put('/sitesUpdate/:id',sitesUpdate)
 
 router.get('/horaire', getHoraire)

@@ -859,7 +859,7 @@ exports.getSite = (req,res) =>{
 }
 
 exports.getSiteAll = (req,res) =>{
-  const q = "SELECT sites_travail.*, emp1.company_name FROM sites_travail INNER JOIN clients AS emp1 ON sites_travail.client_id = emp1.id";
+  const q = "SELECT sites_travail.*, emp1.company_name FROM sites_travail INNER JOIN clients AS emp1 ON sites_travail.client_id = emp1.id WHERE sites_travail.est_supprime = 0";
    
   db.query(q ,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -893,7 +893,7 @@ exports.postSites = (req, res) => {
 
 exports.deleteSite = (req,res) =>{
   const {id} = req.params
-  const q = "DELETE * FROM sites_travail WHERE client_id = ?";
+  const q = "UPDATE sites_travail SET est_supprime = 1 WHERE id = ?";
    
   db.query(q ,id,(error, data)=>{
       if(error) res.status(500).send(error)
