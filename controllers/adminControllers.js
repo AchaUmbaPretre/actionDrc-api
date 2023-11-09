@@ -1698,7 +1698,7 @@ exports.updateFacture = (req, res) =>{
 }
 
 exports.getPayement = (req, res) =>{
-  const q = "SELECT payments.*, emp1.nom AS methode_paiement, employees.first_name, employees.last_name FROM payments INNER JOIN methode_paiement AS emp1 ON payments.payment_method = emp1.id INNER JOIN employees ON payments.employeId = employees.id ";
+  const q = "SELECT payments.*, emp1.nom AS methode_paiement, employees.first_name, employees.last_name FROM payments INNER JOIN methode_paiement AS emp1 ON payments.payment_method = emp1.id INNER JOIN employees ON payments.employeId = employees.id WHERE payments.est_supprime = 0";
    
   db.query(q ,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -1846,7 +1846,7 @@ exports.postPayement = (req, res) => {
 exports.deletePayement = (req, res) =>{
 
   const clientId = req.params.id;
-  const q = "DELETE FROM payments WHERE id = ?"
+  const q = "UPDATE payments SET est_supprime = 1 WHERE id = ?"
 
   db.query(q, [clientId], (err, data)=>{
       if (err) return res.send(err);

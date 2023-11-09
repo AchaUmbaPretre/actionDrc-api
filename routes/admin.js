@@ -242,7 +242,7 @@ router.get('/payementView/:id', getPayementView);
 router.get('/payementTotal/:id', getPayementTotal);
 router.get('/payementTotalSelect/:employeeId/:month', getPayementTotalSelect);
 router.post('/payementPost', postPayement);
-router.delete('/payement/:id', deletePayement);
+router.put('/payement/:id', deletePayement);
 router.put('/payementPut/:id', updatePaiement);
 
 router.get('/mois', getMois)
