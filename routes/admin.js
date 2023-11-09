@@ -162,7 +162,7 @@ router.get('/pays', getPays)
 router.get('/clientCount', getClientCount)
 router.get('/viewsClient/:id', viewsClient)
 router.post('/clientPost', postClient)
-router.delete('/client/:id', deleteClient)
+router.put('/clients/:id', deleteClient)
 router.put('/client/:id', updateClient)
 
 

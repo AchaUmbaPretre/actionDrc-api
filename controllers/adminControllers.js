@@ -522,7 +522,7 @@ exports.updateContrat = (req, res) =>{
 }
 
 exports.getClient = (req, res) =>{
-    const q = "SELECT * FROM clients";
+    const q = "SELECT * FROM clients WHERE est_supprime = 0";
      
     db.query(q ,(error, data)=>{
         if(error) res.status(500).send(error)
@@ -603,7 +603,7 @@ exports.postClient = (req, res) => {
 exports.deleteClient = (req, res) =>{
 
     const clientId = req.params.id;
-    const q = "DELETE FROM clients WHERE id = ?"
+    const q = "UPDATE clients SET est_supprime = 1 WHERE id = ?"
 
     db.query(q, [clientId], (err, data)=>{
         if (err) return res.send(err);
