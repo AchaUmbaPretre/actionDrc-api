@@ -233,7 +233,7 @@ router.get('/factureCalculTotal/:id', getFactureCalculTotal);
 router.get('/factureContratCount/:id', getFactureContratCount);
 router.get('/factureAllView/:id', getAllFactureView);
 router.post('/factures', postFacture);
-router.delete('/facture/:id', deleteFacture);
+router.put('/factures/:id', deleteFacture);
 router.put('/factureUpdate/:id', updateFacture)
 
 router.get('/payement', getPayement);

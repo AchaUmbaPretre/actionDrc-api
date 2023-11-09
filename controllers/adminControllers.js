@@ -1569,7 +1569,7 @@ exports.getMontantStatus = (req, res) => {
 }
 
 exports.getAllFacture = (req, res) => {
-  const q = "SELECT invoices.id, invoice_date, created_at, due_date, total_amount,status , emp2.company_name FROM invoices INNER JOIN clients AS emp2 ON invoices.client_id = emp2.id";
+  const q = "SELECT invoices.id, invoice_date, created_at, due_date, total_amount,status , emp2.company_name FROM invoices INNER JOIN clients AS emp2 ON invoices.client_id = emp2.id WHERE invoices.est_supprime = 0";
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
@@ -1672,7 +1672,7 @@ exports.postFacture = async (req, res) => {
 exports.deleteFacture = (req, res) =>{
 
   const clientId = req.params.id;
-  const q = "DELETE FROM invoices WHERE id = ?"
+  const q = "UPDATE invoices SET est_supprime = 1 WHERE id = ?"
 
   db.query(q, [clientId], (err, data)=>{
       if (err) return res.send(err);
