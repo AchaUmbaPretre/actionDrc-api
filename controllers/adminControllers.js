@@ -102,7 +102,7 @@ exports.deleteEmploye = (req, res) => {
 
 exports.updateEmploye = (req, res)=> {
     const employeId = req.params.id;
-    const q = "UPDATE employees SET `first_name`= ?, `last_name`= ?, `date_of_birth`= ?, `gender`= ?, `address`= ?,`phone_number`= ?, `email`= ?, `identification_number`= ?, `etat_civil`= ?, `number_inpp`= ?, `number_cnss`= ?, `nombre_enfant`= ?, `identification_type`= ?,`skills`= ?, `certifications`= ?, `employment_status`= ? WHERE id = ?"
+    const q = "UPDATE employees SET `first_name`= ?, `last_name`= ?, `date_of_birth`= ?, `gender`= ?, `address`= ?,`phone_number`= ?, `email`= ?, `identification_number`= ?, `etat_civil`= ?, `number_inpp`= ?, `number_cnss`= ?, `nombre_enfant`= ?, `identification_type`= ?,`skills`= ?, `certifications`= ?, `employment_status`= ?, `source = ?` WHERE id = ?"
     const values = [
         req.body.first_name,
         req.body.last_name,
@@ -119,7 +119,8 @@ exports.updateEmploye = (req, res)=> {
         req.body.identification_type,
         req.body.skills,
         req.body.certifications,
-        req.body.employment_status
+        req.body.employment_status,
+        req.body.source
     ];
     db.query(q, [...values,employeId], (err, data) => {
         if (err) return res.send(err);
@@ -776,7 +777,7 @@ exports.getAllAffectationOne = (req, res) => {
 exports.deleteAffectation = (req, res) =>{
 
     const clientId = req.params.id;
-    const q = "UPDATE affectations SET est_supprime WHERE id = ?"
+    const q = "UPDATE affectations SET est_supprime = 1 WHERE id = ?"
 
     db.query(q, [clientId], (err, data)=>{
         if (err) return res.send(err);
