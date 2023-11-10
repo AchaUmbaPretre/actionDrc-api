@@ -754,7 +754,7 @@ exports.getAffectationCount = (req, res) => {
 }
 
 exports.getAllAffectation = (req, res) => {
-  const q = "SELECT affectations.id,affectations.created_at, emp1.id AS userId, emp1.first_name, emp1.last_name, emp1.skills, fonction.contrat_id, fonction.avantages, fonction.salaire, fonction.prix, contrats.end_date, contrats.	contract_type, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction ON affectations.fonction_id = fonction.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id WHERE affectations.est_supprime = 0";
+  const q = "SELECT affectations.id,affectations.created_at, emp1.id AS userId, emp1.first_name, emp1.last_name, emp1.skills, fonction.contrat_id, fonction.avantages, fonction.salaire, fonction.prix, contrats.end_date, contrats.	contract_type, clients.company_name AS client_nom, departement.nom_departement FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction ON affectations.fonction_id = fonction.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id INNER JOIN departement ON emp1.skills = departement.id WHERE affectations.est_supprime = 0";
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
