@@ -41,10 +41,11 @@ exports.getEmployeJoin = (req, res) => {
 exports.viewsEmploye = (req, res) => {
   const { id } = req.params;
   const q = `
-    SELECT employees.*, clients.company_name AS nom_client
+    SELECT employees.*, clients.company_name AS nom_client, departement.nom_departement
     FROM employees
     LEFT JOIN contrats ON employees.contrat_id = contrats.id
     LEFT JOIN clients ON contrats.client_id = clients.id
+    INNER JOIN departement ON employees.skills = departement.id
     WHERE employees.id = ?
   `;
   
