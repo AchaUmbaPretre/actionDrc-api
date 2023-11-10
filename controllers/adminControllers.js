@@ -1341,7 +1341,8 @@ exports.getPresenceOneView = (req, res) => {
     attendance.check_out_time,
     emp1.first_name,
     emp1.last_name,
-    presence_status WHERE attendance.est_supprime = 0`;
+    presence_status
+    `;
 
   db.query(q, id, (error, data) => {
     if (error) {
