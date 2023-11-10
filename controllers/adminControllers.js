@@ -6,7 +6,7 @@ const moment = require('moment');
 dotenv.config();
 
 exports.getEmploye = (req, res) => {
-    const q = "SELECT * FROM employees WHERE est_supprime = 0";
+    const q = "SELECT employees.*, departement.nom_departement FROM employees JOIN departement ON employees.skills = departement.id WHERE est_supprime = 0";
      
     db.query(q, (error, data) => {
         if (error) res.status(500).send(error);
