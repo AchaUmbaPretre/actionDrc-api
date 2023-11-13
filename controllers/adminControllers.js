@@ -10,7 +10,6 @@ exports.getEmploye = (req, res) => {
      
     db.query(q, (error, data) => {
         if (error) res.status(500).send(error);
-
         return res.status(200).json(data);
     });
 };
@@ -516,7 +515,6 @@ exports.updateContrat = (req, res) =>{
         req.body.end_date,
         req.body.contract_status,
     ]
-
     db.query(q, [...values,contratId], (err, data) => {
         if (err) return res.send(err);
         return res.json(data);
@@ -559,7 +557,6 @@ exports.getClientCount = (req, res) => {
 
   db.query(q ,(error, data)=>{
     if(error) res.status(500).send(error)
-
     return res.status(200).json(data);
 })
 }
@@ -572,7 +569,6 @@ exports.viewsClient = (req, res) =>{
         if(error) res.status(500).send(error)
         return res.status(200).json(data);
     })
-       
 }
 
 exports.postClient = (req, res) => {
@@ -606,7 +602,6 @@ exports.deleteClient = (req, res) =>{
 
     const clientId = req.params.id;
     const q = "UPDATE clients SET est_supprime = 1 WHERE id = ?"
-
     db.query(q, [clientId], (err, data)=>{
         if (err) return res.send(err);
       return res.json(data);
@@ -635,14 +630,11 @@ exports.updateClient = (req, res) => {
   });
 };
 
-
-
 exports.getFonction = (req, res) =>{
     const q = "SELECT * FROM fonctions";
      
     db.query(q ,(error, data)=>{
         if(error) res.status(500).send(error)
-
         return res.status(200).json(data);
     })
 }
@@ -726,13 +718,10 @@ exports.getAffectation = (req,res) =>{
      
     db.query(q ,(error, data)=>{
         if(error) res.status(500).send(error)
-
         return res.status(200).json(data);
     })
 }
 
-/* SELECT affectations.id, emp1.first_name, emp1.last_name, emp1.skills, fonction_client.contrat_id, fonction_client.avantages, fonction_client.salaire, fonction_client.prix, contrats.end_date, contrats.contract_type, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction_client ON affectations.fonction_clientId = fonction_client.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id WHERE affectations.id = 114;
- */
 exports.getAffectationUn = (req,res) =>{
   const {id} = req.params;
   const q = "SELECT * FROM affectations where id = ?";
@@ -746,7 +735,6 @@ exports.getAffectationUn = (req,res) =>{
 
 exports.getAffectationCount = (req, res) => {
   const q = "SELECT count(*) as total FROM affectations WHERE est_supprime = 0";
-
   db.query(q ,(error, data)=>{
     if(error) res.status(500).send(error)
 
@@ -788,7 +776,6 @@ exports.deleteAffectation = (req, res) =>{
 
 exports.affectationUpdate = (req, res) => {
   const { id } = req.params;
-  // Récupérer les données à mettre à jour depuis le corps de la requête (req.body)
   const updatedData = req.body;
 
   delete updatedData.first_name;
@@ -808,7 +795,6 @@ exports.affectationUpdate = (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Affectation not found" });
     }
-
     return res.status(200).json({ message: "Affectation updated successfully" });
   });
 };
@@ -1650,10 +1636,7 @@ exports.getAllFactureView = (req, res) => {
 
 exports.postFacture = async (req, res) => {
   const { client_id, total_amount, status } = req.body;
-
   const montantInitial = parseInt(total_amount);
-
-
   try {
     const montantQuery = 'INSERT INTO invoices (client_id, total_amount, status) VALUES (?, ?, ?)';
 
