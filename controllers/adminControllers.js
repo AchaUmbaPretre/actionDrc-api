@@ -1029,8 +1029,6 @@ exports.postMission = (req, res) => {
 exports.updateMission = (req, res) =>{
   const { id } = req.params;
   const update = updatedData = req.body;
-  
-  /* const {agent_id, client_id, dateEntrant, dateSortant, duree, montant } = req.body; */
 
   const query = `UPDATE mission SET heureEntrant = ?, heureSortant = ? WHERE id = ?`;
   const values = [req.body.heureEntrant, req.body.heureSortant];
