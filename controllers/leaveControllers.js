@@ -75,7 +75,7 @@ exports.getLeave = (req, res) =>{
     })
   }
   
-  exports.viewsLeave = (req, res) =>{
+  exports.viewsDemandeLeave = (req, res) =>{
       const {id} = req.params;
       const q = "SELECT * FROM leave_requests where id = ?";
   
