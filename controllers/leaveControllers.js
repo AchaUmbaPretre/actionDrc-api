@@ -67,11 +67,10 @@ exports.getLeave = (req, res) =>{
   
 
   exports.getDemandeLeave = (req, res) =>{
-    const q = "SELECT * FROM leave_requests";
+    const q = "SELECT leave_requests.*,leave_type.nom_type, leave_type.nombre_jour, employees.first_name, employees.last_name FROM leave_requests INNER JOIN leave_type ON leave_requests.leave_type = leave_type.id INNER JOIN employees ON leave_requests.employee_id = employees.id";
      
     db.query(q ,(error, data)=>{
         if(error) res.status(500).send(error)
-  
         return res.status(200).json(data);
     })
   }
