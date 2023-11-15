@@ -6,12 +6,12 @@ router.get('/typeConge', getLeave);
 router.get('/typeConge/:id', viewsLeave);
 router.post('/typeConge', postLeave);
 router.delete('/typeConge/:id', deleteLeave);
-router.put('/typeConge', updateLeave);
+router.put('/typeConge/:id', updateLeave);
 
 router.get('/demandeConge', getDemandeLeave);
 router.get('/demandeConge/:id', viewsDemandeLeave);
 router.post('/demandeConge', postDemandeLeave);
 router.delete('/demandeConge/:id', deleteDemandeLeave);
-router.put('/demandeConge', updateDemandeLeave);
+router.put('/demandeConge/:id', updateDemandeLeave);
 
 module.exports = router;

@@ -116,10 +116,13 @@ exports.getLeave = (req, res) =>{
   
   exports.updateDemandeLeave = (req, res) => {
     const id = req.params.id;
-    const q = "UPDATE leave_requests SET `nom_type`= ?, `nombre_jour`= ? WHERE id = ?";
+    const q = "UPDATE leave_requests SET `employee_id`= ?, `start_date`= ?, `end_date`= ?, `leave_type`= ?, `status`= ? WHERE id = ?";
     const values = [
-      req.body.nom_type,
-      req.body.nombre_jour
+      req.body.employee_id,
+      req.body.start_date,
+      req.body.end_date,
+      req.body.leave_type,
+      req.body.status
     ];
     db.query(q, [...values, id], (err, data) => {
       if (err) return res.send(err);
