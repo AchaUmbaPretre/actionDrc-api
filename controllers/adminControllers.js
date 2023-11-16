@@ -553,7 +553,7 @@ exports.getPays = (req, res) =>{
 }
 
 exports.getClientCount = (req, res) => {
-  const q = "SELECT count(*) as total FROM clients WHERE est_supprime";
+  const q = "SELECT count(*) as total FROM clients WHERE est_supprime = 0";
 
   db.query(q ,(error, data)=>{
     if(error) res.status(500).send(error)
