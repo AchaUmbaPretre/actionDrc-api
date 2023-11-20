@@ -1581,10 +1581,12 @@ exports.getFactureCalcul = (req, res) => {
   });
 };
 
+ /*  SELECT SUM(fonction.prix) AS montant_total, contrats.id, contrats.contract_type, clients.company_name FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction ON contrats.id = fonction.contrat_id WHERE employees.contrat_id = ? */;
+
 exports.getFactureCalculTotal = (req, res) => {
   const { id } = req.params;
   const q = `
-  SELECT SUM(fonction.prix) AS montant_total, contrats.id, contrats.contract_type, clients.company_name FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction ON contrats.id = fonction.contrat_id WHERE employees.contrat_id = ?;
+ SELECT SUM(fonction.prix) AS montant_total, contrats.id, contrats.contract_type, clients.company_name FROM affectations LEFT JOIN contrats ON affectations.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction ON affectations.fonction_id = fonction.id WHERE affectations.contrat_id = 52 AND affectations.est_supprime = 0;
   `;
   
   db.query(q, id, (error, data) => {
