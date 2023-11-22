@@ -377,7 +377,7 @@ exports.getContratInfo = (req, res) =>{
 }
 
 exports.getContratInfosAll = (req, res) =>{
-  const q = "SELECT fonction.*,clients.company_name AS nom_client, competences.nom, competences.id AS id_competence FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN competences ON fonction.skills = competences.id";
+  const q = "SELECT fonction.*,clients.company_name AS nom_client, departement.nom_departement, departement.id AS id_departement FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN departement ON fonction.skills = departement.id";
    
   db.query(q ,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -481,7 +481,6 @@ exports.postContratInfo = (req, res) => {
   const q = 'INSERT INTO fonction(`contrat_id`, `client_id`, `skills`, `avantages`, `prix`, `salaire`) VALUES(?, ?, ?, ?, ?, ?)';
 
   const { contrat_id, client_id, skills, avantages, prix, salaire} = req.body;
-
 
   const values = [contrat_id, client_id, skills, avantages, prix, salaire];
 
@@ -1560,16 +1559,16 @@ exports.getAllFacture = (req, res) => {
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
-    }
-    
+    }  
     return res.status(200).json(data);
   });
 }
 
+/* SELECT employees.id, employees.first_name, employees.last_name,employees.skills, clients.company_name AS nom_client, fonction.prix, fonction.salaire FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction ON contrats.id = fonction.contrat_id WHERE employees.contrat_id = ?; */
 exports.getFactureCalcul = (req, res) => {
   const { id } = req.params;
   const q = `
-  SELECT employees.id, employees.first_name, employees.last_name,employees.skills, clients.company_name AS nom_client, fonction.prix, fonction.salaire FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction ON contrats.id = fonction.contrat_id WHERE employees.contrat_id = ?;
+  SELECT employees.id, employees.first_name, employees.last_name, employees.skills, clients.company_name AS nom_client, fonction.prix, fonction.salaire FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN affectations ON employees.id = affectations.emploie_id LEFT JOIN fonction ON affectations.fonction_id = fonction.id WHERE affectations.contrat_id = ? AND affectations.est_supprime = 0
   `;
   
   db.query(q, id, (error, data) => {
@@ -1586,7 +1585,7 @@ exports.getFactureCalcul = (req, res) => {
 exports.getFactureCalculTotal = (req, res) => {
   const { id } = req.params;
   const q = `
- SELECT SUM(fonction.prix) AS montant_total, contrats.id, contrats.contract_type, clients.company_name FROM affectations LEFT JOIN contrats ON affectations.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction ON affectations.fonction_id = fonction.id WHERE affectations.contrat_id = 52 AND affectations.est_supprime = 0;
+ SELECT SUM(fonction.prix) AS montant_total, contrats.id, contrats.contract_type, clients.company_name FROM affectations LEFT JOIN contrats ON affectations.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction ON affectations.fonction_id = fonction.id WHERE affectations.contrat_id = ? AND affectations.est_supprime = 0;
   `;
   
   db.query(q, id, (error, data) => {
@@ -1744,15 +1743,18 @@ INNER JOIN
 INNER JOIN
   contrats ON employees.contrat_id = contrats.id
 LEFT JOIN
-  fonction ON contrats.id = fonction.contrat_id
+  affectations ON employees.id = affectations.emploie_id
+LEFT JOIN
+  fonction ON affectations.fonction_id = fonction.id
 WHERE
   attendance.employee_id = ?
   AND YEAR(date) = YEAR(CURRENT_DATE())
   AND MONTH(date) = MONTH(CURRENT_DATE())
+  AND attendance.est_supprime = 0
 GROUP BY
   YEAR(date), MONTH(date)
 ORDER BY
-  YEAR(date), MONTH(date)`
+  YEAR(date), MONTH(date);`
       db.query(q,id ,(error, data)=>{
         if(error) res.status(500).send(error)
 
@@ -1797,17 +1799,16 @@ WHERE
   attendance.employee_id = ?
   AND YEAR(date) = YEAR(CURRENT_DATE())
   AND MONTH(date) = ?
+  AND attendance.est_supprime = 0
 GROUP BY
   YEAR(date), MONTH(date)
 ORDER BY
   YEAR(date), MONTH(date)`
       db.query(q ,[employeeId, month] ,(error, data)=>{
         if(error) res.status(500).send(error)
-
       return res.status(200).json(data);
       })
 } 
-
 
 
 exports.postPayement = (req, res) => {
