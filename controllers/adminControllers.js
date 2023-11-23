@@ -102,7 +102,7 @@ exports.deleteEmploye = (req, res) => {
 
 exports.updateEmploye = (req, res)=> {
     const employeId = req.params.id;
-    const q = "UPDATE employees SET `first_name`= ?, `last_name`= ?, `date_of_birth`= ?, `gender`= ?, `address`= ?,`phone_number`= ?, `email`= ?, `identification_number`= ?, `etat_civil`= ?, `number_inpp`= ?, `number_cnss`= ?, `nombre_enfant`= ?, `identification_type`= ?,`skills`= ?, `certifications`= ?, `employment_status`= ?, `source = ?` WHERE id = ?"
+    const q = "UPDATE employees SET first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, address = ?, phone_number = ?, email = ?, identification_number = ?, etat_civil = ?, number_inpp = ?, number_cnss = ?, nombre_enfant = ?, identification_type = ?, skills = ?, certifications = ?, employment_status = ?, source = ? WHERE id = ?";
     const values = [
         req.body.first_name,
         req.body.last_name,
@@ -122,10 +122,11 @@ exports.updateEmploye = (req, res)=> {
         req.body.employment_status,
         req.body.source
     ];
+
     db.query(q, [...values,employeId], (err, data) => {
-        if (err) return res.send(err);
+      if (err) return res.send(err);
         return res.json(data);
-      });
+    });
 }
 
 exports.getDepartement = (req, res) =>{
@@ -260,7 +261,6 @@ exports.getAllContrat = (req, res) => {
         contrat.status = 'En cours';
       }
     });
-    
     return res.status(200).json(data);
   });
 }
@@ -277,7 +277,6 @@ exports.getContratCount = (req, res) => {
 
 exports.viewsContrat = (req, res) =>{
     const {id} = req.params;
-
     const q = "SELECT contrats.*, emp1.company_name FROM contrats INNER JOIN clients AS emp1 ON contrats.client_id = emp1.id WHERE contrats.id = ?";
 
     db.query(q, id, (error, data) => {
@@ -388,7 +387,7 @@ exports.getContratInfosAll = (req, res) =>{
 
 exports.getContratInfosAllOne = (req, res) =>{
   const {id} = req.params
-  const q = "SELECT fonction.*,clients.company_name AS nom_client, competences.nom, competences.id AS id_competence  FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN competences ON fonction.skills = competences.id WHERE fonction.contrat_id = ?";
+  const q = "SELECT fonction.*,clients.company_name AS nom_client, departement.nom_departement, departement.id AS id_departement  FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN departement ON fonction.skills = departement.id WHERE fonction.contrat_id = ?";
    
   db.query(q ,id,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -398,7 +397,7 @@ exports.getContratInfosAllOne = (req, res) =>{
 
 exports.getContratFonctionAllOne = (req, res) =>{
   const {id} = req.params
-  const q = "SELECT fonction.*,clients.company_name AS nom_client, competences.nom  FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN competences ON fonction.skills = competences.id WHERE fonction.id = ?";
+  const q = "SELECT fonction.*,clients.company_name AS nom_client, departement.nom_departement  FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN departement ON fonction.skills = departement.id WHERE fonction.id = ?";
    
   db.query(q ,id,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -408,7 +407,7 @@ exports.getContratFonctionAllOne = (req, res) =>{
 
 exports.deleteContratInfo = (req, res) =>{
   const {id} = req.params
-  const q = "DELETE fonction FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN competences ON fonction.skills = competences.id WHERE fonction.id = ?";
+  const q = "DELETE fonction FROM fonction LEFT JOIN contrats ON fonction.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN departement ON fonction.skills = departement.id WHERE fonction.id = ?";
    
   db.query(q ,id,(error, data)=>{
       if(error) res.status(500).send(error)
