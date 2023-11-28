@@ -457,7 +457,7 @@ exports.getContratEmploieOne = (req, res) =>{
 
 exports.postContratEmploie = (req, res) => {
   const q = 'INSERT INTO fonction_client(`contrat_id`, `client_id`, `skills`, `avantages`, `salaire`, `prix`) VALUES(?, ?, ?, ?, ?, ?)';
-  const { contrat_id, client_id, skills, avantages, salaire, prix } = req.body;
+  const { contrat_id, client_id, skills, avantages, salaire, prix } = req.body.selectData[0];
 
   const values = [contrat_id, client_id, skills, avantages, salaire, prix];
 
@@ -466,7 +466,7 @@ exports.postContratEmploie = (req, res) => {
       res.status(500).json(error);
       console.log(error);
     } else {
-      const contratEmploieId = data.insertId; // Obtenez l'ID du contrat nouvellement créé
+      const contratEmploieId = data.insertId;
 
       res.json({
         message: 'Processus réussi',
@@ -722,7 +722,7 @@ exports.getAffectation = (req,res) =>{
 
 exports.getAffectationUn = (req,res) =>{
   const {id} = req.params;
-  const q = "SELECT * FROM affectations where id = ?";
+  const q = "SELECT * FROM affectations where id = ? and est_supprime = 0";
    
   db.query(q ,id,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -741,7 +741,7 @@ exports.getAffectationCount = (req, res) => {
 }
 
 exports.getAllAffectation = (req, res) => {
-  const q = "SELECT affectations.id,affectations.created_at, emp1.id AS userId, emp1.first_name, emp1.last_name, emp1.skills, fonction.contrat_id, fonction.avantages, fonction.salaire, fonction.prix, contrats.end_date, contrats.	contract_type, clients.company_name AS client_nom, departement.nom_departement FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction ON affectations.fonction_id = fonction.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id INNER JOIN departement ON emp1.skills = departement.id WHERE affectations.est_supprime = 0";
+  const q = "SELECT affectations.id,affectations.created_at, emp1.id AS userId, emp1.first_name, emp1.last_name, emp1.skills, fonction_client.contrat_id, fonction_client.avantages, fonction_client.salaire, fonction_client.prix, contrats.end_date, contrats.contract_type, clients.company_name AS client_nom, departement.nom_departement FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction_client ON affectations.fonction_id = fonction_client.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id INNER JOIN departement ON emp1.skills = departement.id WHERE affectations.est_supprime = 0";
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
@@ -782,7 +782,6 @@ exports.affectationUpdate = (req, res) => {
   delete updatedData.client_nom;
   delete updatedData.end_date;
   delete updatedData.avantages
-
 
   const q = "UPDATE affectations SET ? WHERE id = ?";
   db.query(q, [updatedData, id], (error, result) => {
@@ -826,7 +825,6 @@ exports.getSiteOne = (req,res) =>{
   const {id} = req.params;
 
   const q = "SELECT sites_travail.*, emp1.company_name FROM sites_travail INNER JOIN clients AS emp1 ON sites_travail.client_id = emp1.id WHERE sites_travail.id = ?";
-   
   db.query(q ,id,(error, data)=>{
       if(error) res.status(500).send(error)
       return res.status(200).json(data);
