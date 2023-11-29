@@ -1589,7 +1589,7 @@ exports.getFactureCalculTotal = (req, res) => {
 
 exports.getFactureContratCount = (req, res) => {
   const {id} = req.params;
-  const q = "SELECT count(*) as total FROM employees WHERE employees.contrat_id = ?";
+  const q = "SELECT count(*) as total FROM employees WHERE employees.contrat_id = ? and employees.est_supprime = 0";
 
   db.query(q ,id,(error, data)=>{
     if(error) res.status(500).send(error)
@@ -1817,8 +1817,6 @@ exports.postPayement = (req, res) => {
     }
   });
 };
-
-
 
 exports.deletePayement = (req, res) =>{
 
