@@ -25,7 +25,7 @@ exports.getEmployeCount = (req, res) => {
 }
 
 exports.getEmployeJoin = (req, res) => {
-  const q = "SELECT employees.*, affectations.emploie_id AS nom_emploi FROM employees JOIN affectations ON employees.id = affectations.employee_id";
+  const q = "SELECT employees.*, affectations.emploie_id AS nom_emploi FROM employees JOIN affectations ON employees.id = affectations.employee_id WHERE est_supprime = 0";
   
   db.query(q, (err, results) => {
     if (err) {
@@ -277,7 +277,7 @@ exports.getContratCount = (req, res) => {
 
 exports.viewsContrat = (req, res) =>{
     const {id} = req.params;
-    const q = "SELECT contrats.*, emp1.company_name FROM contrats INNER JOIN clients AS emp1 ON contrats.client_id = emp1.id WHERE contrats.id = ?";
+    const q = "SELECT contrats.*, emp1.company_name FROM contrats INNER JOIN clients AS emp1 ON contrats.client_id = emp1.id WHERE contrats.id = ? and contrats.est_supprime = 0";
 
     db.query(q, id, (error, data) => {
         if (error) {
@@ -446,7 +446,7 @@ exports.getContratEmploie = (req, res) =>{
 
 exports.getContratEmploieOne = (req, res) =>{
   const {id} = req.params;
-  const q = "SELECT affectations.id , emp1.avantages, emp1.salaire, emp1.prix,  emp2.first_name, emp2.last_name, emp2.skills, emp3.end_date, emp3.contract_type, emp4.company_name FROM affectations INNER JOIN fonction_client AS emp1 ON affectations.fonction_clientId = emp1.id INNER JOIN employees AS emp2 ON affectations.emploie_id = emp2.id INNER JOIN contrats AS emp3 ON affectations.contrat_id = emp3.id INNER JOIN clients AS emp4 ON emp3.client_id = emp4.id WHERE affectations.id = ?";
+  const q = "SELECT affectations.id , emp1.avantages, emp1.salaire, emp1.prix,  emp2.first_name, emp2.last_name, emp2.skills, emp3.end_date, emp3.contract_type, emp4.company_name FROM affectations INNER JOIN fonction_client AS emp1 ON affectations.fonction_clientId = emp1.id INNER JOIN employees AS emp2 ON affectations.emploie_id = emp2.id INNER JOIN contrats AS emp3 ON affectations.contrat_id = emp3.id INNER JOIN clients AS emp4 ON emp3.client_id = emp4.id WHERE affectations.id = ? and affectations.est_supprime = 0";
    
   db.query(q ,id,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -561,7 +561,7 @@ exports.getClientCount = (req, res) => {
 
 exports.viewsClient = (req, res) =>{
     const {id} = req.params;
-    const q = "SELECT * FROM clients where id = ?";
+    const q = "SELECT * FROM clients where id = ? and est_supprime = 0";
 
     db.query(q, id, (error, data)=>{
         if(error) res.status(500).send(error)
@@ -649,7 +649,7 @@ exports.getFonctionDetail = (req, res) =>{
 }
 
 exports.getEmploieDispo = (req, res) =>{
-  const q = "SELECT employees.*, IF(contrats.end_date IS NULL OR contrats.end_date < CURDATE(), 'disponible', 'indisponible') AS disponibilite FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id"
+  const q = "SELECT employees.*, IF(contrats.end_date IS NULL OR contrats.end_date < CURDATE(), 'disponible', 'indisponible') AS disponibilite FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id where est_supprime = 0"
     db.query(q, (error, results)=>{
       if (error) {
         console.error(error);
@@ -940,7 +940,7 @@ exports.getMissionWeek = (req,res) =>{
 }
 exports.getMissionContrat = (req,res) =>{
   const {id} = req.params;
-  const q = "SELECT contrats.*, clients.company_name FROM contrats INNER JOIN  clients ON contrats.client_id = clients.id where client_id = ?";
+  const q = "SELECT contrats.*, clients.company_name FROM contrats INNER JOIN  clients ON contrats.client_id = clients.id where client_id = ? and contrats.est_supprime = 0";
    
   db.query(q ,id, (error, data)=>{
       if(error) res.status(500).send(error)
@@ -965,7 +965,7 @@ exports.getMissionContrat = (req,res) =>{
 
 exports.getMissionContratTitle = (req, res) =>{
   const {id} = req.params;
-  const q = "SELECT contrats.id,clients.company_name, contrats.contract_type FROM contrats INNER JOIN clients ON contrats.client_id = clients.id where contrats.client_id = ?";
+  const q = "SELECT contrats.id,clients.company_name, contrats.contract_type FROM contrats INNER JOIN clients ON contrats.client_id = clients.id where contrats.client_id = ? and contrats.est_supprime = 0";
    
   db.query(q , id,(error, data)=>{
       if(error) res.status(500).send(error)
@@ -978,7 +978,7 @@ exports.getContratAff = (req, res)=>{
 
   const q = `
   SELECT id, first_name, last_name, phone_number
-  FROM employees WHERE employees.contrat_id = ?`;
+  FROM employees WHERE employees.contrat_id = ? and employees.est_supprime = 0`;
 
   db.query(q, [contratId], (error, results) => {
     if (error) {
@@ -1159,7 +1159,6 @@ exports.getAllHoraire = (req, res) => {
     if (error) {
       return res.status(500).send(error);
     }
-    
     return res.status(200).json(data);
   });
 }
@@ -1175,20 +1174,6 @@ exports.getAllHoraireView = (req, res) => {
     return res.status(200).json(data);
   });
 }
-
-/* export const getAllHoraire = (req, res) => {
-
-    const query = `SELECT * FROM work_schedule WHERE type = 'variable'`;
-  
-    db.query(query, (error, results) => {
-      if (error) {
-        console.error(error);
-        res.status(500).json({ erreur : 'Échec de la récupération des horaires variables' });
-      } else {
-        res.status(200).json(results);
-      }
-    });
-  }; */
 
 exports.deleteHoraire = (req, res) =>{
 
@@ -1294,8 +1279,7 @@ GROUP BY
   e.last_name,
   c.company_name,
   month_name,
-  presence_status`
-  /* const q = "SELECT attendance.id, date, check_in_time, check_out_time, emp1.id AS emp1_id, emp1.first_name, emp2.company_name FROM attendance INNER JOIN employees AS emp1 ON attendance.employee_id = emp1.id INNER JOIN clients AS emp2 ON attendance.client_id = emp2.id"; */
+  presence_status`;
   db.query(q, (error, data) => {
     if (error) {
       return res.status(500).send(error);
@@ -1414,7 +1398,7 @@ exports.postPresence = (req, res) => {
 
 exports.countPresence = (req, res) => {
   const employeeId = req.params.id;
-  const q = 'SELECT COUNT(*) AS attendanceCount FROM attendance WHERE employee_id = ?';
+  const q = 'SELECT COUNT(*) AS attendanceCount FROM attendance WHERE employee_id = ? and est_supprime = 0';
 
   db.query(q,employeeId, (error, results) => {
     if (error) {
@@ -1572,7 +1556,7 @@ exports.getAllFacture = (req, res) => {
   });
 }
 
-/* SELECT employees.id, employees.first_name, employees.last_name,employees.skills, clients.company_name AS nom_client, fonction.prix, fonction.salaire FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction ON contrats.id = fonction.contrat_id WHERE employees.contrat_id = ?; */
+
 exports.getFactureCalcul = (req, res) => {
   const { id } = req.params;
   const q = `
@@ -1587,8 +1571,6 @@ exports.getFactureCalcul = (req, res) => {
     }
   });
 };
-
- /*  SELECT SUM(fonction.prix) AS montant_total, contrats.id, contrats.contract_type, clients.company_name FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction ON contrats.id = fonction.contrat_id WHERE employees.contrat_id = ? */;
 
 exports.getFactureCalculTotal = (req, res) => {
   const { id } = req.params;
