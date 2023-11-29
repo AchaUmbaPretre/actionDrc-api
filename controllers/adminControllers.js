@@ -684,18 +684,29 @@ exports.updateEmployeFonction = (req, res)=> {
 
 
 exports.postAffectation = (req, res) =>{
-    const q = 'INSERT INTO affectations(`fonction_id`,`fonction_clientId`,`emploie_id`,`contrat_id`) VALUES(?)';
-    const values = [
-        req.body.fonction_id,
-        req.body.fonction_clientId,
-        req.body.emploie_id,
-        req.body.contrat_id,
-    ]
+  const emploieId = req.body.emploie_id;
+  const selectQuery = 'SELECT * FROM affectations WHERE emploie_id = ? and est_supprime = 0';
+  db.query(selectQuery, [emploieId], (error,data)=>{
+    if (error) {
+      return res.status(500).json(error);
+      }
+      if(data.length > 0 ){
+        return res.status(400).json("L'employé est déjà affecté.")
+      }else{
+        const q = 'INSERT INTO affectations(`fonction_id`,`fonction_clientId`,`emploie_id`,`contrat_id`) VALUES(?)';
+        const values = [
+          req.body.fonction_id,
+          req.body.fonction_clientId,
+          req.body.emploie_id,
+          req.body.contrat_id,
+        ]
 
-    db.query(q, [values], (error,data)=>{
-        if(error) res.status(500).json(error)
-        return res.json('processus reussi');
-    })
+        db.query(q, [values], (error,data)=>{
+          if(error) res.status(500).json(error)
+            return res.json('processus reussi');
+        })
+      }
+  })
 }
 
 exports.postFonctionClient = (req, res) =>{
