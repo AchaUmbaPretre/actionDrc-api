@@ -1560,7 +1560,7 @@ exports.getAllFacture = (req, res) => {
 exports.getFactureCalcul = (req, res) => {
   const { id } = req.params;
   const q = `
-  SELECT employees.id, employees.first_name, employees.last_name, employees.skills, clients.company_name AS nom_client, fonction.prix, fonction.salaire FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN affectations ON employees.id = affectations.emploie_id LEFT JOIN fonction ON affectations.fonction_id = fonction.id WHERE affectations.contrat_id = ? AND affectations.est_supprime = 0
+  SELECT employees.id, employees.first_name, employees.last_name, employees.skills, clients.company_name AS nom_client, fonction_client.prix, fonction_client.salaire FROM employees LEFT JOIN contrats ON employees.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN affectations ON employees.id = affectations.emploie_id LEFT JOIN fonction_client ON affectations.fonction_id = fonction_client.id WHERE affectations.contrat_id = ? AND affectations.est_supprime = 0
   `;
   
   db.query(q, id, (error, data) => {
@@ -1575,7 +1575,7 @@ exports.getFactureCalcul = (req, res) => {
 exports.getFactureCalculTotal = (req, res) => {
   const { id } = req.params;
   const q = `
- SELECT SUM(fonction.prix) AS montant_total, contrats.id, contrats.contract_type, clients.company_name FROM affectations LEFT JOIN contrats ON affectations.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction ON affectations.fonction_id = fonction.id WHERE affectations.contrat_id = ? AND affectations.est_supprime = 0;
+ SELECT SUM(fonction_client.prix) AS montant_total, contrats.id, contrats.contract_type, clients.company_name FROM affectations LEFT JOIN contrats ON affectations.contrat_id = contrats.id LEFT JOIN clients ON contrats.client_id = clients.id LEFT JOIN fonction_client ON affectations.fonction_id = fonction_client.id WHERE affectations.contrat_id = ? AND affectations.est_supprime = 0;
   `;
   
   db.query(q, id, (error, data) => {
@@ -1725,7 +1725,7 @@ exports.getPayementTotal = (req,res) =>{
   employees.id,
   employees.first_name,
   employees.last_name,
-  (fonction.salaire / 27) * COUNT(*) AS paie
+  (fonction_client.salaire / 27) * COUNT(*) AS paie
 FROM
   attendance
 INNER JOIN
@@ -1733,9 +1733,7 @@ INNER JOIN
 INNER JOIN
   contrats ON employees.contrat_id = contrats.id
 LEFT JOIN
-  affectations ON employees.id = affectations.emploie_id
-LEFT JOIN
-  fonction ON affectations.fonction_id = fonction.id
+  fonction_client ON contrats.id = fonction_client.contrat_id
 WHERE
   attendance.employee_id = ?
   AND YEAR(date) = YEAR(CURRENT_DATE())
@@ -1776,7 +1774,7 @@ exports.getPayementTotalSelect = (req,res) =>{
   employees.id,
   employees.first_name,
   employees.last_name,
-  (fonction.salaire / 27) * COUNT(*) AS paie
+  (fonction_client.salaire / 27) * COUNT(*) AS paie
 FROM
   attendance
 INNER JOIN
@@ -1784,7 +1782,7 @@ INNER JOIN
 INNER JOIN
   contrats ON employees.contrat_id = contrats.id
 LEFT JOIN
-  fonction ON contrats.id = fonction.contrat_id
+  fonction_client ON contrats.id = fonction_client.contrat_id
 WHERE
   attendance.employee_id = ?
   AND YEAR(date) = YEAR(CURRENT_DATE())
