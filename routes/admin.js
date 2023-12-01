@@ -111,15 +111,21 @@ const {
     deleteDepartement,
     updateDepartement,
     viewsDepartement,
+    getEmployeCorbeille,
+    deleteCorbeilleEmploye,
+    getAllCorbeilleContrat,
+    deleteCorbeilleContrats,
   } = require("../controllers/adminControllers.js");
 const router = express.Router()
 
 router.get('/', getEmploye)
+router.get('/corbeille-employe', getEmployeCorbeille)
 router.get('/views/:id', viewsEmploye)
 router.get('/count', getEmployeCount)
 router.post('/employe', postEmploye)
 router.put('/employes/:id', deleteEmploye)
 router.put('/employe/:id', updateEmploye)
+router.delete('/employes-corbeille/:id', deleteCorbeilleEmploye)
 
 router.get('/departement', getDepartement)
 router.get('/departement/:id', viewsDepartement)
@@ -133,6 +139,7 @@ router.get('/typepiece', getType)
 router.get('/status', getStatus)
 
 router.get('/contrat', getAllContrat)
+router.get('/contrat-corbeille', getAllCorbeilleContrat)
 router.get('/contratCount', getContratCount)
 router.get('/contrat/views/:id', viewsContrat)
 router.get('/avantages', getAvantage)
@@ -145,6 +152,8 @@ router.post('/contrat', postContrat)
 router.post('/contratEmploie', postContratEmploie)
 router.put('/contrats/:id', deleteContrat)
 router.put('/contrat/:id', updateContrat)
+router.delete('/contrat-corbeille/:id', deleteCorbeilleContrats)
+
 
 router.get('/contratInfo', getContratInfosAll)
 router.get('/contratInfo/:id', getContratInfosAllOne)

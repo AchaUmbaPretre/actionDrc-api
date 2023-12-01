@@ -14,6 +14,15 @@ exports.getEmploye = (req, res) => {
     });
 };
 
+exports.getEmployeCorbeille = (req, res) => {
+  const q = "SELECT employees.*, departement.nom_departement FROM employees JOIN departement ON employees.skills = departement.id WHERE est_supprime = 1";
+   
+  db.query(q, (error, data) => {
+      if (error) res.status(500).send(error);
+      return res.status(200).json(data);
+  });
+};
+
 exports.getEmployeCount = (req, res) => {
   const q = "SELECT COUNT(*) AS total FROM employees WHERE est_supprime = 0";
 
@@ -98,6 +107,16 @@ exports.deleteEmploye = (req, res) => {
     if (err) return res.send(err);
     return res.json(data);
   });
+};
+
+exports.deleteCorbeilleEmploye = (req, res) => {
+  const {id} = req.params;
+  const q = "DELETE FROM employees WHERE id = ?"
+
+  db.query(q, [id], (err, data)=>{
+      if (err) return res.send(err);
+    return res.json(data);
+  })
 };
 
 exports.updateEmploye = (req, res)=> {
@@ -247,7 +266,29 @@ exports.getAllContrat = (req, res) => {
     if (error) {
       return res.status(500).send(error);
     }
-    
+    const currentDate = new Date();
+    data.forEach((contrat) => {
+      const startDate = new Date(contrat.start_date);
+      const endDate = new Date(contrat.end_date);
+
+      if (endDate < currentDate) {
+        contrat.status = 'Résilié';
+      } else if (startDate > currentDate) {
+        contrat.status = 'En attente';
+      } else {
+        contrat.status = 'En cours';
+      }
+    });
+    return res.status(200).json(data);
+  });
+}
+
+exports.getAllCorbeilleContrat = (req, res) => {
+  const q = "SELECT contrats.*, emp1.company_name FROM contrats INNER JOIN clients AS emp1 ON contrats.client_id = emp1.id WHERE contrats.est_supprime = 1";
+  db.query(q, (error, data) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
     const currentDate = new Date();
     data.forEach((contrat) => {
       const startDate = new Date(contrat.start_date);
@@ -519,6 +560,16 @@ exports.updateContrat = (req, res) =>{
       });
 }
 
+exports.deleteCorbeilleContrats = (req, res) => {
+  const {id} = req.params;
+  const q = "DELETE FROM contrats WHERE id = ?"
+
+  db.query(q, [id], (err, data)=>{
+      if (err) return res.send(err);
+    return res.json(data);
+  })
+};
+
 exports.getClient = (req, res) =>{
     const q = "SELECT * FROM clients WHERE est_supprime = 0";
      
@@ -763,7 +814,7 @@ exports.getAllAffectation = (req, res) => {
 
 exports.getAllAffectationOne = (req, res) => {
   const {id} = req.params;
-  const q = "SELECT affectations.id, emp1.first_name, emp1.last_name, emp1.skills, fonction.contrat_id, fonction.avantages, fonction.salaire, fonction.prix, contrats.end_date, contrats.contract_type, clients.company_name AS client_nom FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction ON affectations.fonction_id = fonction.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id WHERE affectations.id = ?";
+  const q = "SELECT affectations.id,affectations.created_at, emp1.id AS userId, emp1.first_name, emp1.last_name, emp1.skills, fonction_client.contrat_id, fonction_client.avantages, fonction_client.salaire, fonction_client.prix, contrats.end_date, contrats.contract_type, clients.company_name AS client_nom, departement.nom_departement FROM affectations INNER JOIN employees AS emp1 ON affectations.emploie_id = emp1.id INNER JOIN fonction_client ON affectations.fonction_id = fonction_client.id INNER JOIN contrats ON affectations.contrat_id = contrats.id INNER JOIN clients ON contrats.client_id = clients.id INNER JOIN departement ON emp1.skills = departement.id WHERE affectations.id = ? and affectations.est_supprime = 0";
   db.query(q, id,(error, data) => {
     if (error) {
       return res.status(500).send(error);
@@ -1460,6 +1511,10 @@ exports.updatePresence = (req, res) =>{
 
 exports.getRapportPresence = (req, res) => {
   const { startDate, endDate, employee_id } = req.query;
+  const formattedStartDate = moment(startDate).format('YYYY-MM-DD');
+  const formattedEndDate = moment(endDate).format('YYYY-MM-DD');
+
+  console.log(req.query)
   const q = `SELECT
   a.id,
   a.date,
@@ -1516,7 +1571,7 @@ GROUP BY
 ORDER BY
   a.date ASC;`
 
-  db.query(q, [startDate, endDate, startDate, endDate, employee_id], (error, data) => {
+  db.query(q, [formattedStartDate, formattedEndDate, formattedStartDate, formattedEndDate, employee_id], (error, data) => {
     if (error) {
       console.log(error)
       return res.status(500).send(error);
